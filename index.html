@@ -1363,51 +1363,60 @@ async function loadCloudLeaderboard() {
       }
     }
 
-    function renderLeaderboard(dataOverride){
-      const data = dataOverride || loadLeaderboard();
-      leaderboardBody.innerHTML='';
-      data.forEach((row, idx)=>{
-        let rowClass='';
-        if(idx === 0) rowClass='gold-row';
-        else if(idx === 1) rowClass='silver-row';
-        else if(idx === 2) rowClass='bronze-row';
-        else rowClass='lb-other';
+function renderLeaderboard(data){
+  const rows = data || [];
+  leaderboardBody.innerHTML = '';
 
-        const tr=document.createElement('tr');
-        tr.className = rowClass;
-        tr.innerHTML = `
-          <td>${idx+1}</td>
-          <td>${row.name}</td>
-          <td>${row.totalFish}</td>
-          <td>${formatTime(row.time)}</td>`;
-        leaderboardBody.appendChild(tr);
-      });
+  rows.forEach((row, idx) => {
+    let rowClass = '';
+    if (idx === 0) rowClass = 'gold-row';
+    else if (idx === 1) rowClass = 'silver-row';
+    else if (idx === 2) rowClass = 'bronze-row';
+    else rowClass = 'lb-other';
 
-      renderMyBest(data);
-    }
+    const tr = document.createElement('tr');
+    tr.className = rowClass;
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>${row.name}</td>
+      <td>${row.totalFish}</td>
+      <td>${formatTime(row.time)}</td>`;
+    leaderboardBody.appendChild(tr);
+  });
 
-    function addResultToLeaderboard(){
-      const durationSec = (Date.now() - runStartTimeMs)/1000;
-      const data = loadLeaderboard();
-      const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
-      const entry = {
-        name: nameToUse,
-        fishGained: runFishGained,
-        totalFish: unlockedFish,
-        time: durationSec,
-        score: score
-      };
-      data.push(entry);
-      data.sort((a,b)=>{
-        if(b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
-        if(b.score !== a.score) return b.score - a.score;
-        return a.time - b.time;
-      });
-      const top = data.slice(0, 50);
-      saveLeaderboard(top);
-      pushRunToCloud(entry);
-      renderLeaderboard(top);
-    }
+  renderMyBest(rows);
+}
+
+
+function addResultToLeaderboard(){
+  const durationSec = (Date.now() - runStartTimeMs) / 1000;
+  const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
+
+  const entry = {
+    name: nameToUse,
+    fishGained: runFishGained,
+    totalFish: unlockedFish,
+    time: durationSec,
+    score: score
+  };
+
+  // отправляем в Firestore
+  pushRunToCloud(entry);
+
+  // обновляем локальную копию облачного топа
+  let data = cloudLeaderboard ? cloudLeaderboard.slice() : [];
+  data.push(entry);
+
+  data.sort((a, b) => {
+    if (b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
+    if (b.score !== a.score) return b.score - a.score;
+    return a.time - b.time;
+  });
+
+  cloudLeaderboard = data.slice(0, 100);
+  renderLeaderboard(cloudLeaderboard);
+}
+
 
     function openGameOver(reason){
       overlayResultLabel.style.display = 'block';
