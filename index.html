@@ -1015,6 +1015,7 @@
     }
     const db = firebase.firestore();
     const LEADERBOARD_COLLECTION = "fast_click_leaderboard";
+    let cloudLeaderboard = [];
 
     async function pushRunToCloud(row) {
       try {
@@ -1031,34 +1032,35 @@
       }
     }
 
-    async function loadCloudLeaderboard() {
-      try {
-        const snap = await db.collection(LEADERBOARD_COLLECTION)
-          .orderBy("fishGained", "desc")
-          .orderBy("score", "desc")
-          .orderBy("time", "asc")
-          .limit(100)
-          .get();
+async function loadCloudLeaderboard() {
+  try {
+    const snap = await db.collection(LEADERBOARD_COLLECTION)
+      .orderBy("fishGained", "desc")
+      .orderBy("score", "desc")
+      .orderBy("time", "asc")
+      .limit(100)
+      .get();
 
-        const rows = [];
-        snap.forEach(doc => {
-          const d = doc.data();
-          rows.push({
-            name: d.name || "Игрок",
-            fishGained: d.fishGained || 0,
-            totalFish: d.totalFish || 0,
-            time: d.time || 0,
-            score: d.score || 0
-          });
-        });
+    cloudLeaderboard = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      cloudLeaderboard.push({
+        name: d.name || "Игрок",
+        fishGained: d.fishGained || 0,
+        totalFish: d.totalFish || 0,
+        time: d.time || 0,
+        score: d.score || 0
+      });
+    });
 
-        if (rows.length) {
-          renderLeaderboard(rows);
-        }
-      } catch (e) {
-        console.warn("Не удалось загрузить онлайн-лидерборд из Firestore", e);
-      }
-    }
+    renderLeaderboard(cloudLeaderboard);
+  } catch (e) {
+    console.warn("Не удалось загрузить онлайн-лидерборд из Firestore", e);
+    // если облако недоступно — показываем хотя бы локальный топ
+    renderLeaderboard(loadLeaderboard());
+  }
+}
+
 
 
     const MAX_MISSES = 3;
