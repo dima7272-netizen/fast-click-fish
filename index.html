@@ -750,45 +750,80 @@
       gap: 8px;
     }
 
-    @media (max-width: 880px) { .fish-card { display:none; } }
-    @media (max-width: 520px) {
-  
-    .run-inline-stats {
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      margin:10px 0 14px;
-    }
-    .run-inline-item {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.9);
-      border:1px solid rgba(55,65,81,0.9);
-      font-size:12px;
-    }
-    .run-inline-icon {
-      font-size:16px;
-    }
-    .run-inline-label {
-      opacity:0.78;
-    }
-    .run-inline-value {
-      font-weight:700;
-      color:#e5f9ff;
-      min-width:32px;
-      text-align:right;
-    }
+@media (max-width: 880px) {
+  /* справа панель рыб убираем на планшетах и телефонах */
+  .fish-card {
+    display: none;
+  }
+}
 
-    .circles-row { gap:18px; }
-      .circle { width:96px; height:96px; font-size:24px; }
-      .game-card {
-      min-height: 900px; padding:18px 16px 22px; }
-      .leaderboard-panel { display:none; }
-      .stats-bar { flex-direction:column; }
-    }
+/* Телефоны — вертикальный режим */
+@media (max-width: 520px) {
+  body {
+    align-items: flex-start;
+    padding: 8px 0 16px;
+  }
+
+  .wrapper {
+    max-width: 420px;
+    margin-top: 8px;
+    padding: 0 10px;
+  }
+
+  .game-card {
+    margin-top: 16px;
+    min-height: auto;
+    padding: 16px 12px 20px;
+  }
+
+  /* Верхняя панель статистики — в колонку */
+  .stats-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 8px 10px;
+  }
+
+  /* Круги чуть меньше и ближе друг к другу */
+  .circles-row {
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+
+  .circle {
+    width: 90px;
+    height: 90px;
+    font-size: 24px;
+  }
+
+  /* Внутренняя статистика раунда — компактнее */
+  .run-inline-stats {
+    gap: 10px;
+    margin: 6px 0 10px;
+  }
+
+  .run-inline-item {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  /* Лидерборд слева прячем на телефонах */
+  .leaderboard-panel {
+    display: none;
+  }
+
+  /* Немного уменьшаем шрифты, чтобы всё помещалось */
+  .score-value {
+    font-size: 30px;
+  }
+
+  .leaderboard-title {
+    font-size: 18px;
+  }
+}
+
   </style>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
