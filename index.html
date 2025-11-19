@@ -1036,8 +1036,6 @@ async function loadCloudLeaderboard() {
   try {
     const snap = await db.collection(LEADERBOARD_COLLECTION)
       .orderBy("fishGained", "desc")
-      .orderBy("score", "desc")
-      .orderBy("time", "asc")
       .limit(100)
       .get();
 
@@ -1060,6 +1058,7 @@ async function loadCloudLeaderboard() {
     renderLeaderboard(loadLeaderboard());
   }
 }
+
 
 
 
@@ -1702,7 +1701,17 @@ function addResultToLeaderboard(){
     buildFishGrid();
     resetUI();
     loadPlayerName();
-    renderLeaderboard();
+    function savePlayerName(){
+  playerName = playerNameInput.value.trim() || 'Игрок';
+  try{
+    localStorage.setItem('fastClickPlayerName', playerName);
+  }catch(e){}
+  playerNameInput.value = playerName;
+  playerNameInput.readOnly = true;
+  saveNameBtn.style.display = 'none';
+  renderLeaderboard(cloudLeaderboard);
+}
+
     loadCloudLeaderboard();
     loadTotals();
 
