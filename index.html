@@ -1,1 +1,1701 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Быстрый Клик — Рыбный Индекс</title>
+  <style>
+    * { box-sizing: border-box; }
 
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text","Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1b2333 0%, #05060b 55%, #020308 100%);
+      color: #f5f5f7;
+      padding: 0 0 24px;
+    }
+
+    .wrapper {
+      text-align: center;
+      padding: 0 20px;
+      max-width: 720px;
+      width: 100%;
+      margin-top: 0;
+    }
+
+    /* ПАНЕЛЬ СЧЁТОВ (вместо названия) */
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .stat-card {
+      flex: 1;
+      background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+      border-radius: 18px;
+      padding: 10px 14px;
+      box-shadow: 0 0 0 1px rgba(31,41,55,0.9), 0 10px 22px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:19px;
+      box-shadow:0 0 10px rgba(248,250,252,0.4);
+    }
+    .stat-icon.coins {
+      background: radial-gradient(circle at 30% 20%, #fff7cc, #ffd74c 40%, #f59e0b 100%);
+      color:#3b2300;
+    }
+    .stat-icon.diamonds {
+      background: radial-gradient(circle at 25% 20%, #dcfce7, #22c55e 45%, #15803d 100%);
+      color:#022c22;
+    }
+    .stat-icon.stars {
+      background: radial-gradient(circle at 30% 20%, #fdf2ff, #e879f9 40%, #a21caf 100%);
+      color:#3b0a40;
+    }
+    .stat-main {
+      text-align:left;
+    }
+    .stat-title {
+      font-size:11px;
+      opacity:0.78;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+    }
+    .stat-current {
+      font-size:20px;
+      font-weight:800;
+      margin-top:1px;
+    }
+    .stat-total {
+      font-size:11px;
+      opacity:0.78;
+    }
+
+    .game-card {
+      min-height: 900px;
+      margin-top: 80px;
+      background: radial-gradient(circle at top left, rgba(255, 215, 90, 0.06), transparent 60%),
+                  radial-gradient(circle at bottom right, rgba(139, 92, 246, 0.08), transparent 55%),
+                  #050814;
+      border-radius: 28px;
+      padding: 20px 22px 28px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02), 0 18px 35px rgba(0, 0, 0, 0.75);
+      position: relative;
+      overflow: visible;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .score-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .score-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff3c4, #ffb63d 55%, #f59e0b 100%);
+      box-shadow: 0 0 14px rgba(255, 214, 94, 0.85), 0 0 26px rgba(249, 115, 22, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #5b3200;
+    }
+
+    .score-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffe58a;
+      text-shadow: 0 0 14px rgba(255, 214, 94, 0.75);
+      line-height: 1;
+      transition: transform 0.16s ease-out;
+    }
+    .score-value.bump { transform: scale(1.16); }
+
+    .timer-lives {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(8, 12, 26, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-size: 12px;
+    }
+
+    .badge-icon { font-size: 15px; }
+    .badge-label { opacity: 0.78; }
+
+    .hearts {
+      display: flex;
+      gap: 6px;
+      filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.95));
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #050814;
+      border: 1px solid rgba(15,23,42,0.9);
+    }
+    .heart-full, .heart-empty {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .heart-full {
+      background: radial-gradient(circle at 30% 20%, #1f2937, #111827 60%, #0f172a 100%);
+      color: #f87171;
+    }
+    .heart-empty {
+      background: radial-gradient(circle at 30% 20%, #111827, #020617 60%);
+      border: 1px solid #4b5563;
+      color: #4b5563;
+    }
+
+    #timerBar {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+    #timerFill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #f97373, #fb923c, #facc15, #4ade80);
+      transform-origin: left center;
+      transform: scaleX(0);
+      transition: transform 0.06s linear;
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.5);
+    }
+
+
+    .run-inline-stats {
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      margin:10px 0 14px;
+    }
+    .run-inline-item {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.9);
+      border:1px solid rgba(55,65,81,0.9);
+      font-size:12px;
+    }
+    .run-inline-icon {
+      font-size:16px;
+    }
+    .run-inline-label {
+      opacity:0.78;
+    }
+    .run-inline-value {
+      font-weight:700;
+      color:#e5f9ff;
+      min-width:32px;
+      text-align:right;
+    }
+
+    .circles-row {
+      display: flex;
+      justify-content: center;
+      gap: 26px;
+      margin-bottom: 16px;
+    }
+
+    .circle {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      background: radial-gradient(circle at 30% 25%, #111827, #020617);
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.42), inset 0 0 25px rgba(15, 23, 42, 0.9);
+      position: relative;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(148, 163, 184, 0.9);
+      font-size: 28px;
+    }
+
+    .circle.active:not(.bomb-visible):not(.green-bonus) {
+      background: radial-gradient(circle at 25% 20%, #fdf4ff, #a855f7 40%, #6d28d9 100%);
+      box-shadow: 0 0 0 1px rgba(216, 180, 254, 0.8), 0 0 18px rgba(168, 85, 247, 0.95), 0 0 50px rgba(129, 140, 248, 0.8);
+      color: #fefce8;
+      animation: pulse 1.05s infinite;
+    }
+
+    .circle.green-bonus {
+      background: radial-gradient(circle at 25% 20%, #dcfce7, #22c55e 45%, #15803d 100%);
+      box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.95), 0 0 22px rgba(34, 197, 94, 0.95), 0 0 60px rgba(45, 212, 191, 0.9);
+      color: #ecfdf5;
+      animation: pulseGreen 0.9s infinite;
+    }
+
+    .circle.active:hover {
+      transform: translateY(-3px) scale(1.06);
+    }
+
+    .circle.bomb-visible {
+      background: radial-gradient(circle at 30% 20%, #fee2e2, #fb1f41 45%, #7f1d1d 100%);
+      box-shadow: 0 0 0 1px rgba(254, 202, 202, 0.9), 0 0 22px rgba(239, 68, 68, 1), 0 0 55px rgba(248, 113, 113, 0.9);
+      color: #ffe4e6;
+      animation: bombPulse 0.8s infinite;
+    }
+
+    .circle-icon { pointer-events: none; }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+    @keyframes bombPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.09); }
+      100% { transform: scale(1); }
+    }
+
+    #message {
+      min-height: 16px;
+      font-size: 13px;
+      opacity: 0.86;
+      margin-bottom: 8px;
+    }
+
+    #startBtn {
+      border-radius: 999px;
+      border: none;
+      padding: 10px 26px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: radial-gradient(circle at 30% 20%, #fff7cc, #ffd74c 40%, #f59e0b 100%);
+      color: #3b1f00;
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.9), 0 10px 26px rgba(245, 158, 11, 0.45);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+      display: inline-block;
+      margin: 0 auto;
+    }
+    #startBtn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 1), 0 14px 32px rgba(245, 158, 11, 0.6);
+      filter: brightness(1.03);
+    }
+    #startBtn:active:not(:disabled) {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 0 0 1px rgba(234, 179, 8, 1), 0 6px 20px rgba(180, 83, 9, 0.55);
+    }
+    #startBtn:disabled {
+      opacity: 0.65;
+      cursor: default;
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle at 30% 20%, #e5e7eb, #d1d5db 40%, #9ca3af 100%);
+      color: #111827;
+    }
+
+    #rulesBtn {
+      margin-top: 6px;
+      border: none;
+      background: none;
+      color: #9ca3af;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      opacity: 0.85;
+    }
+    #rulesBtn:hover {
+      color: #e5e7eb;
+      opacity: 1;
+    }
+
+    .reward-popup {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -10px);
+      font-size: 20px;
+      font-weight: 700;
+      color: #bbf7d0;
+      text-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+      pointer-events: none;
+      animation: flyUp 0.7s ease-out forwards;
+      white-space: nowrap;
+    }
+    @keyframes flyUp {
+      0% { opacity:0; transform:translate(-50%,10px) scale(0.8); }
+      20% { opacity:1; transform:translate(-50%,-4px) scale(1.05); }
+      100% { opacity:0; transform:translate(-50%,-38px) scale(0.9); }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.98));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+      z-index: 10;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+    .overlay.visible { opacity:1; pointer-events:auto; }
+
+    .overlay-card {
+      background: radial-gradient(circle at top, rgba(250, 204, 21, 0.08), rgba(15, 23, 42, 0.98));
+      border-radius: 26px;
+      padding: 24px 22px 20px;
+      text-align: center;
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35), 0 24px 40px rgba(0, 0, 0, 0.9);
+      max-width: 540px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .overlay-icon {
+      font-size: 64px;
+      color: #ffe58a;
+      text-shadow: 0 0 26px rgba(250, 204, 21, 0.98);
+    }
+    .overlay-title { font-size: 30px; font-weight: 800; }
+    .overlay-sub { font-size: 18px; opacity: 0.95; }
+    .overlay-result-label { font-size: 13px; opacity:0.78; }
+    .overlay-score {
+      font-size: 30px;
+      font-weight: 800;
+      color: #ffe58a;
+      text-shadow: 0 0 12px rgba(250, 204, 21, 0.9);
+    }
+    .overlay-btn {
+      margin-top: 4px;
+      border-radius: 999px;
+      border: none;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: radial-gradient(circle at 30% 20%, #fff7cc, #ffd74c 40%, #f59e0b 100%);
+      color: #3b1f00;
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.9), 0 10px 26px rgba(245, 158, 11, 0.45);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+    }
+    .overlay-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 1), 0 14px 32px rgba(245, 158, 11, 0.6);
+      filter: brightness(1.03);
+    }
+    .overlay-btn:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 0 0 1px rgba(234, 179, 8, 1), 0 6px 20px rgba(180, 83, 9, 0.55);
+    }
+
+    .overlay-rules {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(55, 65, 81, 0.85);
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .overlay-rules-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .overlay-rules-row .icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* HELP */
+    #helpOverlay .overlay-card { max-width: 640px; }
+    .help-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin: 10px 0 4px;
+    }
+    .help-cell {
+      background: radial-gradient(circle at top, rgba(15,23,42,0.95), #020617);
+      border-radius: 16px;
+      padding: 10px 8px 10px;
+      box-shadow: 0 0 0 1px rgba(31,41,55,0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .help-circle {
+      width: 74px;
+      height: 74px;
+      border-radius: 999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:34px;
+      color:#f9fafb;
+      box-shadow:0 0 20px rgba(148,163,184,0.95);
+    }
+    .help-circle.purple {
+      background: radial-gradient(circle at 25% 20%, #fdf4ff, #a855f7 40%, #6d28d9 100%);
+      box-shadow:0 0 18px rgba(168,85,247,0.95);
+    }
+    .help-circle.red {
+      background: radial-gradient(circle at 30% 20%, #fee2e2, #fb1f41 45%, #7f1d1d 100%);
+      box-shadow:0 0 18px rgba(248,113,113,0.95);
+    }
+    .help-circle.green {
+      background: radial-gradient(circle at 25% 20%, #dcfce7, #22c55e 45%, #15803d 100%);
+      box-shadow:0 0 18px rgba(34,197,94,0.95);
+    }
+    .help-caption-strong { font-size: 14px; font-weight: 700; }
+    .help-caption { opacity: 0.9; text-align:center; font-size: 13px; }
+    .help-footer { font-size: 14px; opacity: 0.95; margin-top: 8px; }
+
+    .heart-overlay {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      opacity:0;
+      transition:opacity 0.2s ease;
+      z-index:8;
+    }
+    .heart-overlay.visible { opacity:1; }
+    .heart-overlay-icon {
+      font-size:200px;
+      animation:heartBreak 1.4s ease-out;
+      filter:drop-shadow(0 0 24px rgba(248,113,113,0.95));
+    }
+    @keyframes heartBreak {
+      0% { transform:scale(0.4); opacity:0; }
+      40% { transform:scale(1.2); opacity:1; }
+      100% { transform:scale(1.0) translateY(-18px); opacity:0; }
+    }
+
+    /* FISH PANEL */
+    .fish-card {
+      position: fixed;
+      top: 14px;
+      right: 18px;
+      background: radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 55%), #020919;
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9), 0 18px 32px rgba(0, 0, 0, 0.7);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 360px;
+      max-height: calc(100vh - 32px);
+      z-index: 15;
+    }
+    .fish-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 4px;
+    }
+    .fish-nick-row {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-top:2px;
+      font-size:11px;
+      opacity:0.9;
+    }
+    .fish-nick-row span.label { opacity:0.85; }
+
+    #playerNameInput {
+      width: 150px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background:#020617;
+      color:#e5e7eb;
+      font-size:12px;
+      outline:none;
+    }
+    #playerNameInput::placeholder { color:#6b7280; }
+    #playerNameInput[readonly] { cursor: pointer; background:#020617; }
+
+    #saveNameBtn {
+      padding:4px 10px;
+      border-radius:999px;
+      border:none;
+      font-size:11px;
+      cursor:pointer;
+      background:linear-gradient(90deg,#22c55e,#16a34a);
+      color:#ecfdf5;
+      display:none;
+    }
+
+    .fish-level-box { text-align:right; }
+    .fish-level-label { font-size:11px; opacity:0.7; margin-bottom:2px; }
+    .fish-progress-text {
+      font-size:20px;
+      font-weight:800;
+      color:#facc15;
+      text-shadow:0 0 14px rgba(250,204,21,0.9);
+    }
+
+    .fish-progress-bar {
+      width:100%; height:8px; border-radius:999px;
+      background:rgba(15,23,42,0.95);
+      overflow:hidden;
+    }
+    .fish-progress-fill {
+      height:100%; width:0%;
+      background:linear-gradient(90deg,#22c55e,#a3e635,#38bdf8);
+      box-shadow:0 0 10px rgba(56,189,248,0.8);
+      transition:width 0.25s ease-out;
+    }
+
+    .fish-grid {
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      flex:1;
+      overflow-y:auto;
+      padding:8px 2px 4px 2px;
+    }
+
+    .fish-slot {
+      position:relative;
+      background:radial-gradient(circle at top, rgba(15,23,42,0.9), #020617);
+      border-radius:12px;
+      padding:10px 10px 8px;
+      box-shadow:0 0 0 1px rgba(15,23,42,0.85);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      font-size:11px;
+    }
+    .fish-emoji {
+      font-size:78px;
+      margin-bottom:4px;
+      filter:grayscale(1) brightness(0.3);
+      opacity:0.55;
+    }
+    .fish-name {
+      text-align:center;
+      font-weight:600;
+      color:#6b7280;
+      min-height:32px;
+    }
+    .fish-req { font-size:10px; opacity:0.6; }
+
+    .fish-slot.unlocked {
+      background:radial-gradient(circle at top, rgba(34,197,94,0.18), rgba(15,23,42,0.98));
+      box-shadow:0 0 0 1px rgba(34,197,94,0.85), 0 0 18px rgba(22,163,74,0.7);
+    }
+    .fish-slot.unlocked .fish-emoji {
+      filter:none;
+      opacity:1;
+      text-shadow:0 0 14px rgba(59,130,246,0.9);
+    }
+    .fish-slot.unlocked .fish-name { color:#e5f9ff; }
+
+    .fish-slot.just-unlocked { animation:fishGlow 0.7s ease-out; }
+    @keyframes fishGlow {
+      0% { transform:scale(0.9); box-shadow:0 0 0 1px rgba(34,197,94,0.9),0 0 35px rgba(56,189,248,1); }
+      100% { transform:scale(1); }
+    }
+
+    /* LEADERBOARD */
+    .leaderboard-panel {
+      position: fixed;
+      top: 14px;
+      left: 18px;
+      z-index: 20;
+      background: radial-gradient(circle at top left, rgba(250,204,21,0.12), rgba(15,23,42,0.96));
+      padding: 10px 12px 10px;
+      border-radius: 18px;
+      box-shadow: 0 0 0 1px rgba(55,65,81,0.85), 0 12px 24px rgba(0,0,0,0.8);
+      min-width: 280px;
+      max-width: 360px;
+    }
+    .leaderboard-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      text-shadow: 0 0 12px rgba(250,204,21,0.7);
+    }
+
+    .leaderboard-table-wrapper {
+      max-height: 520px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+    .leaderboard-panel table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .leaderboard-panel th,
+    .leaderboard-panel td {
+      padding: 4px 6px;
+      text-align: left;
+    }
+    .leaderboard-panel thead {
+      background: rgba(15,23,42,0.98);
+    }
+    .leaderboard-panel th {
+      border-bottom: 1px solid rgba(55,65,81,0.9);
+      font-weight: 700;
+    }
+    .leaderboard-panel tbody tr:nth-child(even) td {
+      background: rgba(15,23,42,0.9);
+    }
+
+    .gold-row td {
+      background: none;
+      color: #facc15;
+      text-shadow: 0 0 8px rgba(250, 204, 21, 0.9);
+      font-weight: 800;
+    }
+    .silver-row td {
+      background: none;
+      color: #ffffff;
+      text-shadow: 0 0 6px rgba(209, 213, 219, 0.9);
+      font-weight: 700;
+    }
+    .bronze-row td {
+      background: none;
+      color: #fed7aa;
+      text-shadow: 0 0 6px rgba(248, 153, 96, 0.9);
+      font-weight: 600;
+    }
+    .lb-other td {
+      color: #9ca3af;
+      opacity: 0.9;
+    }
+
+    .leaderboard-mybest {
+      margin-top: 6px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, rgba(34,197,94,0.22), rgba(15,23,42,0.98));
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.7), 0 0 18px rgba(22,163,74,0.7);
+      font-size: 12px;
+      text-align: left;
+    }
+    .leaderboard-mybest-title {
+      font-weight: 800;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .leaderboard-mybest-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    @media (max-width: 880px) { .fish-card { display:none; } }
+    @media (max-width: 520px) {
+  
+    .run-inline-stats {
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      margin:10px 0 14px;
+    }
+    .run-inline-item {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(15,23,42,0.9);
+      border:1px solid rgba(55,65,81,0.9);
+      font-size:12px;
+    }
+    .run-inline-icon {
+      font-size:16px;
+    }
+    .run-inline-label {
+      opacity:0.78;
+    }
+    .run-inline-value {
+      font-weight:700;
+      color:#e5f9ff;
+      min-width:32px;
+      text-align:right;
+    }
+
+    .circles-row { gap:18px; }
+      .circle { width:96px; height:96px; font-size:24px; }
+      .game-card {
+      min-height: 900px; padding:18px 16px 22px; }
+      .leaderboard-panel { display:none; }
+      .stats-bar { flex-direction:column; }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+</head>
+<body>
+  <!-- ЛИДЕРБОРД -->
+  <div class="leaderboard-panel">
+    <div class="leaderboard-title">Топ игр</div>
+    <div class="leaderboard-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Имя</th>
+            <th>Рыб</th>
+            <th>Время</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+    </div>
+    <div class="leaderboard-mybest" id="myBestBlock">
+      <div class="leaderboard-mybest-title">Мой лучший результат</div>
+      <div class="leaderboard-mybest-row">
+        <span>Пока нет данных.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПАНЕЛЬ РЫБ -->
+  <div class="fish-card">
+    <div class="fish-header">
+      <div>
+        <div class="fish-nick-row">
+          <span class="label">Ник:</span>
+          <input id="playerNameInput" placeholder="Ваш ник" />
+          <button id="saveNameBtn">OK</button>
+        </div>
+      </div>
+      <div class="fish-level-box">
+        <div class="fish-level-label">Уровень</div>
+        <div class="fish-progress-text" id="fishProgressText">0 / 21</div>
+      </div>
+    </div>
+
+    <div class="fish-progress-bar"><div class="fish-progress-fill" id="fishProgressFill"></div></div>
+
+    <div class="fish-grid" id="fishGrid"></div>
+  </div>
+
+  <!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
+  <div class="wrapper">
+    <!-- ПАНЕЛЬ МОНЕТ/АЛМАЗОВ/ЗВЁЗД -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon coins">💰</div>
+        <div class="stat-main">
+          <div class="stat-title">Монеты</div>
+          <div class="stat-current" id="coinsRun">0</div>
+          <div class="stat-total">Всего: <span id="coinsTotal">0</span></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon diamonds">💎</div>
+        <div class="stat-main">
+          <div class="stat-title">Алмазы</div>
+          <div class="stat-current" id="diamondsRun">0</div>
+          <div class="stat-total">Всего: <span id="diamondsTotal">0</span></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon stars">⭐</div>
+        <div class="stat-main">
+          <div class="stat-title">Звёзды</div>
+          <div class="stat-current" id="starsRun">0</div>
+          <div class="stat-total">Всего: <span id="starsTotal">0</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-card">
+      <div class="top-row">
+        <div class="score-block">
+          <div class="score-icon">$</div>
+          <div><div id="score" class="score-value">0</div></div>
+        </div>
+
+        <div class="timer-lives">
+          <div class="badge"><span class="badge-icon">⏱</span><span class="badge-label" id="roundTimeLabel">2.0 c</span></div>
+          <div class="badge">
+            <div class="hearts" id="heartsView">
+              <span class="heart-full">❤</span><span class="heart-full">❤</span><span class="heart-full">❤</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="timerBar"><div id="timerFill"></div></div>
+
+      <div class="run-inline-stats">
+        <div class="run-inline-item">
+          <span class="run-inline-icon">💎</span>
+          <span class="run-inline-label">Алмазы за игру</span>
+          <span class="run-inline-value" id="diamondsRunGame">0</span>
+        </div>
+        <div class="run-inline-item">
+          <span class="run-inline-icon">⭐</span>
+          <span class="run-inline-label">Звёзды за игру</span>
+          <span class="run-inline-value" id="starsRunGame">0</span>
+        </div>
+      </div>
+
+      <div class="circles-row">
+        <button class="circle" data-index="0"><span class="circle-icon">⚡</span></button>
+        <button class="circle" data-index="1"><span class="circle-icon">⚡</span></button>
+        <button class="circle" data-index="2"><span class="circle-icon">⚡</span></button>
+      </div>
+
+      <div id="message"></div>
+      <div style="display:flex; flex-direction:column; align-items:center;">
+        <button id="startBtn">Играть</button>
+        <button id="rulesBtn"><span>❗</span><span>Правила</span></button>
+      </div>
+
+      <!-- ПРАВИЛА / GAME OVER -->
+      <div class="overlay" id="gameOverOverlay">
+        <div class="overlay-card">
+          <div class="overlay-icon">🏆</div>
+          <div class="overlay-title" id="overlayTitle">Игра окончена!</div>
+          <div class="overlay-sub" id="overlaySub">Вы потеряли все жизни.</div>
+          <div class="overlay-result-label" id="overlayResultLabel">Ваш результат:</div>
+          <div class="overlay-score" id="overlayScore">0</div>
+          <button class="overlay-btn" id="playAgainBtn">Играть</button>
+
+          <div class="overlay-rules">
+            <div class="overlay-rules-row">
+              <span class="icon">🎯</span>
+              <span>Нажимайте <b>только</b> на светящийся круг.</span>
+            </div>
+            <div class="overlay-rules-row">
+              <span class="icon">⏳</span>
+              <span>Базовое время раунда — <b>2 секунды</b>, за каждую новую рыбу раунд становится быстрее на <b>0,1 с</b> (до минимума 0,5 с).</span>
+            </div>
+            <div class="overlay-rules-row">
+              <span class="icon">💣</span>
+              <span>Красный круг-бомба горит <b>половину времени раунда</b>: клик по нему = мгновенный проигрыш, пропуск — безопасен.</span>
+            </div>
+            <div class="overlay-rules-row">
+              <span class="icon">🟢</span>
+              <span>Когда красный круг гаснет, он превращается в <b>зелёный бонус</b> — даёт <b>+100</b> монет и алмаз.</span>
+            </div>
+            <div class="overlay-rules-row">
+              <span class="icon">⭐</span>
+              <span>Клик по обычному фиолетовому кругу приносит монеты и <b>1 звезду</b>.</span>
+            </div>
+            <div class="overlay-rules-row">
+              <span class="icon">🐟</span>
+              <span>Каждые <b>1000 монет</b> открывают рыбу в индексе и ускоряют игру.</span>
+            </div>
+            <div class="overlay-rules-row">
+              <span class="icon">💔</span>
+              <span><b>3 промаха</b> — игра заканчивается. Рыбы сохраняются, счёт монет сбрасывается.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HELP -->
+      <div class="overlay" id="helpOverlay">
+        <div class="overlay-card">
+          <div class="overlay-icon">❓</div>
+          <div class="overlay-title">Как играть</div>
+          <div class="overlay-sub">Успей нажать на правильный круг за время раунда и собирай монеты, алмазы и звёзды.</div>
+
+          <div class="help-grid">
+            <div class="help-cell">
+              <div class="help-circle purple">⭐</div>
+              <div class="help-caption-strong">Фиолетовый круг</div>
+              <div class="help-caption">Нажимай, чтобы получить случайное количество монет и <b>+1 звезду</b>.</div>
+            </div>
+            <div class="help-cell">
+              <div class="help-circle red">⚡</div>
+              <div class="help-caption-strong">Красная бомба</div>
+              <div class="help-caption">Опасна только пока горит (½ времени раунда). Затем превращается в зелёный бонус.</div>
+            </div>
+            <div class="help-cell">
+              <div class="help-circle green">💎</div>
+              <div class="help-caption-strong">Зелёный бонус</div>
+              <div class="help-caption">После бомбы даёт <b>+100</b> монет и <b>+1 алмаз</b>.</div>
+            </div>
+          </div>
+
+          <div class="help-footer">
+            Каждые <b>1000 монет</b> открывают новую рыбу в индексе справа. Время раунда ускоряется с каждой новой рыбой.
+          </div>
+
+          <button class="overlay-btn" id="helpCloseBtn">Понятно</button>
+        </div>
+      </div>
+
+      <!-- АНИМАЦИЯ СЕРДЦА -->
+      <div class="heart-overlay" id="heartOverlay">
+        <div class="heart-overlay-icon">💔</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==== Firebase init (online leaderboard) ====
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjaFPl1f4MA5IzFxIWRZ58FvrnB5mRhGo",
+      authDomain: "fast-click-fish.firebaseapp.com",
+      projectId: "fast-click-fish",
+      storageBucket: "fast-click-fish.firebasestorage.app",
+      messagingSenderId: "1056500535536",
+      appId: "1:1056500535536:web:17072be3e0150bdf57f235",
+      measurementId: "G-V05JPW6BM1"
+    };
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      console.warn("Firebase init error (maybe already initialized):", e);
+    }
+    const db = firebase.firestore();
+    const LEADERBOARD_COLLECTION = "fast_click_leaderboard";
+
+    async function pushRunToCloud(row) {
+      try {
+        await db.collection(LEADERBOARD_COLLECTION).add({
+          name: row.name || "Игрок",
+          fishGained: row.fishGained || 0,
+          totalFish: row.totalFish || 0,
+          time: row.time || 0,
+          score: row.score || 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (e) {
+        console.warn("Не удалось отправить результат в Firestore", e);
+      }
+    }
+
+    async function loadCloudLeaderboard() {
+      try {
+        const snap = await db.collection(LEADERBOARD_COLLECTION)
+          .orderBy("fishGained", "desc")
+          .orderBy("score", "desc")
+          .orderBy("time", "asc")
+          .limit(100)
+          .get();
+
+        const rows = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          rows.push({
+            name: d.name || "Игрок",
+            fishGained: d.fishGained || 0,
+            totalFish: d.totalFish || 0,
+            time: d.time || 0,
+            score: d.score || 0
+          });
+        });
+
+        if (rows.length) {
+          renderLeaderboard(rows);
+        }
+      } catch (e) {
+        console.warn("Не удалось загрузить онлайн-лидерборд из Firestore", e);
+      }
+    }
+
+
+    const MAX_MISSES = 3;
+    const BASE_ROUND_TIME_MS = 2000;
+    const MIN_ROUND_TIME_MS = 500;
+
+    const circles = Array.from(document.querySelectorAll('.circle'));
+    const scoreEl = document.getElementById('score');
+    const messageEl = document.getElementById('message');
+    const timerFill = document.getElementById('timerFill');
+    const startBtn = document.getElementById('startBtn');
+    const rulesBtn = document.getElementById('rulesBtn');
+    const heartsView = document.getElementById('heartsView');
+    const roundTimeLabel = document.getElementById('roundTimeLabel');
+
+    const gameOverOverlay = document.getElementById('gameOverOverlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlaySub = document.getElementById('overlaySub');
+    const overlayScore = document.getElementById('overlayScore');
+    const overlayResultLabel = document.getElementById('overlayResultLabel');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+
+    const helpOverlay = document.getElementById('helpOverlay');
+    const helpCloseBtn = document.getElementById('helpCloseBtn');
+
+    const heartOverlay = document.getElementById('heartOverlay');
+
+    const fishGrid = document.getElementById('fishGrid');
+    const fishProgressText = document.getElementById('fishProgressText');
+    const fishProgressFill = document.getElementById('fishProgressFill');
+
+    const playerNameInput = document.getElementById('playerNameInput');
+    const saveNameBtn = document.getElementById('saveNameBtn');
+    const leaderboardBody = document.getElementById('leaderboardBody');
+    const myBestBlock = document.getElementById('myBestBlock');
+
+    const coinsRunEl = document.getElementById('coinsRun');
+    const coinsTotalEl = document.getElementById('coinsTotal');
+    const diamondsRunEl = document.getElementById('diamondsRun');
+    const diamondsTotalEl = document.getElementById('diamondsTotal');
+    const starsRunEl = document.getElementById('starsRun');
+    const starsTotalEl = document.getElementById('starsTotal');
+
+    const fishList = [
+      { name: 'Рыба-клоун', emoji: '🐠' },
+      { name: 'Глубинный угорь', emoji: '🐍' },
+      { name: 'Ледяной окунь', emoji: '🐟' },
+      { name: 'Лунная рыба', emoji: '🌕' },
+      { name: 'Неоновый ангел', emoji: '✨' },
+      { name: 'Пиранья из глубин', emoji: '🦈' },
+      { name: 'Медуза-призрак', emoji: '🪼' },
+      { name: 'Каменный баслет', emoji: '🪨' },
+      { name: 'Кристальный сом', emoji: '💎' },
+      { name: 'Лягушка-дайвер', emoji: '🐸' },
+      { name: 'Краб-гигант', emoji: '🦀' },
+      { name: 'Драконья рыба', emoji: '🐉' },
+      { name: 'Светящийся карп', emoji: '🐟' },
+      { name: 'Электро-сельдь', emoji: '⚡' },
+      { name: 'Радужный лосось', emoji: '🐡' },
+      { name: 'Золотой угорь', emoji: '🐍' },
+      { name: 'Коралловый бычок', emoji: '🐠' },
+      { name: 'Теневой скат', emoji: '🦂' },
+      { name: 'Фосфорный окунь', emoji: '💡' },
+      { name: 'Морской дракон', emoji: '🐲' },
+      { name: 'Космическая рыба', emoji: '🛸' }
+    ];
+    fishList.forEach((fish, i)=> fish.requiredScore=(i+1)*1000);
+
+    function formatNum(n){
+      return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    }
+
+    let score = 0;            // монеты за текущую игру
+    let misses = 0;
+    let activeIndex = null;
+
+    let bombRound = false;
+    let bombDangerIndex = null;
+    let greenBonusIndex = null;
+
+    let rewards = [0,0,0];
+    let timerId = null;
+    let roundActive = false;
+
+    let unlockedFish = 0;
+    let currentRoundTimeMs = BASE_ROUND_TIME_MS;
+
+    let runStartTimeMs = 0;
+    let runStartUnlockedFish = 0;
+    let runFishGained = 0;
+
+    let fishSlots = [];
+    let playerName = '';
+    let helpSeen = false;
+    let pendingContinue = false;
+    let overlayMode = null;
+
+    // алмазы / звёзды и глобальные счётчики
+    let diamondsRun = 0;
+    let starsRun = 0;
+    let totalCoinsAll = 0;
+    let totalDiamondsAll = 0;
+    let totalStarsAll = 0;
+
+    function updateStatsUI(){
+      coinsRunEl.textContent = formatNum(totalCoinsAll);
+      coinsTotalEl.textContent = formatNum(score);
+      diamondsRunEl.textContent = formatNum(totalDiamondsAll);
+      diamondsTotalEl.textContent = formatNum(diamondsRun);
+      starsRunEl.textContent = formatNum(totalStarsAll);
+      starsTotalEl.textContent = formatNum(starsRun);
+      const dRunGame = document.getElementById('diamondsRunGame');
+      const sRunGame = document.getElementById('starsRunGame');
+      if(dRunGame) dRunGame.textContent = formatNum(diamondsRun);
+      if(sRunGame) sRunGame.textContent = formatNum(starsRun);
+      scoreEl.textContent = formatNum(score);
+    }
+
+    function loadTotals(){
+      try{
+        totalCoinsAll = Number(localStorage.getItem('fastClick_totalCoins')||'0');
+        totalDiamondsAll = Number(localStorage.getItem('fastClick_totalDiamonds')||'0');
+        totalStarsAll = Number(localStorage.getItem('fastClick_totalStars')||'0');
+      }catch(e){}
+      updateStatsUI();
+    }
+    function saveTotals(){
+      try{
+        localStorage.setItem('fastClick_totalCoins', String(totalCoinsAll));
+        localStorage.setItem('fastClick_totalDiamonds', String(totalDiamondsAll));
+        localStorage.setItem('fastClick_totalStars', String(totalStarsAll));
+      }catch(e){}
+    }
+
+    function buildFishGrid(){
+      fishGrid.innerHTML='';
+      fishSlots = [];
+      fishList.forEach((fish,index)=>{
+        const slot=document.createElement('div');
+        slot.className='fish-slot';
+        slot.dataset.fishIndex=index;
+        slot.innerHTML=`
+          <div class="fish-emoji">${fish.emoji}</div>
+          <div class="fish-name">${fish.name}</div>
+          <div class="fish-req">${formatNum(fish.requiredScore)} монет</div>`;
+        fishGrid.appendChild(slot);
+        fishSlots.push({slot});
+      });
+      updateFishProgress();
+    }
+
+    function updateFishProgress(){
+      const total = fishList.length;
+      fishProgressText.textContent = unlockedFish + ' / ' + total;
+      const ratio = total === 0 ? 0 : unlockedFish / total;
+      fishProgressFill.style.width = (ratio * 100) + '%';
+
+      fishSlots.forEach((fs, index)=>{
+        if(index < unlockedFish){
+          fs.slot.classList.add('unlocked');
+        } else {
+          fs.slot.classList.remove('unlocked');
+        }
+      });
+    }
+
+    function tryUnlockFish(){
+      const possible = Math.min(Math.floor(score / 1000), fishList.length);
+      if(possible > unlockedFish){
+        const newly = possible - unlockedFish;
+        for(let i = unlockedFish; i < possible; i++){
+          const fs = fishSlots[i];
+          if(!fs) continue;
+          fs.slot.classList.add('unlocked','just-unlocked');
+          setTimeout(()=>fs.slot.classList.remove('just-unlocked'), 700);
+        }
+        unlockedFish = possible;
+        runFishGained = unlockedFish - runStartUnlockedFish;
+
+        currentRoundTimeMs = Math.max(MIN_ROUND_TIME_MS, currentRoundTimeMs - newly * 100);
+        roundTimeLabel.textContent = (currentRoundTimeMs/1000).toFixed(1) + ' c';
+
+        updateFishProgress();
+      }
+    }
+
+    function updateHearts(){
+      const heartsCount = MAX_MISSES;
+      const activeHearts = heartsCount - misses;
+      let html='';
+      for(let i=0;i<activeHearts;i++) html+='<span class="heart-full">❤️</span>';
+      for(let i=0;i<misses;i++) html+='<span class="heart-empty">❤</span>';
+      heartsView.innerHTML = html;
+    }
+
+    function resetUI(){
+      circles.forEach(c=>{
+        c.classList.remove('active','bomb-visible','green-bonus');
+        const icon = c.querySelector('.circle-icon');
+        if(icon) icon.textContent = '⚡';
+      });
+      timerFill.style.transform='scaleX(0)';
+      messageEl.textContent='';
+      updateHearts();
+      pendingContinue = false;
+      startBtn.textContent = 'Играть';
+      heartOverlay.classList.remove('visible');
+    }
+
+    function showRewardPopup(circleEl, text){
+      const popup=document.createElement('div');
+      popup.className='reward-popup';
+      popup.textContent=text;
+      circleEl.appendChild(popup);
+      setTimeout(()=>popup.remove(),700);
+      scoreEl.classList.add('bump');
+      setTimeout(()=>scoreEl.classList.remove('bump'),180);
+    }
+
+    function loadPlayerName(){
+      try{
+        const saved = localStorage.getItem('fastClickPlayerName');
+        if(saved){
+          playerName = saved;
+          playerNameInput.value = saved;
+          playerNameInput.readOnly = true;
+          saveNameBtn.style.display = 'none';
+        } else {
+          playerNameInput.readOnly = false;
+          saveNameBtn.style.display = 'inline-block';
+        }
+      }catch(e){
+        playerNameInput.readOnly = false;
+      }
+    }
+
+    function savePlayerName(){
+      playerName = playerNameInput.value.trim() || 'Игрок';
+      try{
+        localStorage.setItem('fastClickPlayerName', playerName);
+      }catch(e){}
+      playerNameInput.value = playerName;
+      playerNameInput.readOnly = true;
+      saveNameBtn.style.display = 'none';
+      renderLeaderboard();
+    }
+
+    function loadLeaderboard(){
+      try{
+        const raw = localStorage.getItem('fastClickLeaderboard');
+        if(!raw) return [];
+        return JSON.parse(raw);
+      }catch(e){ return []; }
+    }
+
+    function saveLeaderboard(data){
+      try{
+        localStorage.setItem('fastClickLeaderboard', JSON.stringify(data));
+      }catch(e){}
+    }
+
+    function formatTime(sec){
+      const totalMs = Math.round(sec*1000);
+      const s = Math.floor(totalMs/1000);
+      const ms = Math.floor((totalMs%1000)/100);
+      const m = Math.floor(s/60);
+      const s2 = s%60;
+      return `${String(m).padStart(2,'0')}:${String(s2).padStart(2,'0')}.${ms}`;
+    }
+
+    function renderMyBest(data){
+      if(!myBestBlock) return;
+      let best = null;
+      const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
+      data.forEach(row=>{
+        if(row.name !== nameToUse) return;
+        if(!best){
+          best = row;
+        } else {
+          if(row.fishGained > best.fishGained ||
+             (row.fishGained === best.fishGained && row.time < best.time)){
+            best = row;
+          }
+        }
+      });
+
+      if(!best){
+        myBestBlock.innerHTML = `
+          <div class="leaderboard-mybest-title">Мой лучший результат</div>
+          <div class="leaderboard-mybest-row">
+            <span>Пока нет данных.</span>
+          </div>`;
+      } else {
+        myBestBlock.innerHTML = `
+          <div class="leaderboard-mybest-title">Мой лучший результат</div>
+          <div class="leaderboard-mybest-row">
+            <span style=\"font-size:13px;\">Рыб всего: <b style=\"font-size:16px;\">${best.totalFish}</b></span>
+            <span style=\"font-size:13px;\">Время: <b style=\"font-size:16px;\">${formatTime(best.time)}</b></span>
+          </div>`;
+      }
+    }
+
+    function renderLeaderboard(dataOverride){
+      const data = dataOverride || loadLeaderboard();
+      leaderboardBody.innerHTML='';
+      data.forEach((row, idx)=>{
+        let rowClass='';
+        if(idx === 0) rowClass='gold-row';
+        else if(idx === 1) rowClass='silver-row';
+        else if(idx === 2) rowClass='bronze-row';
+        else rowClass='lb-other';
+
+        const tr=document.createElement('tr');
+        tr.className = rowClass;
+        tr.innerHTML = `
+          <td>${idx+1}</td>
+          <td>${row.name}</td>
+          <td>${row.totalFish}</td>
+          <td>${formatTime(row.time)}</td>`;
+        leaderboardBody.appendChild(tr);
+      });
+
+      renderMyBest(data);
+    }
+
+    function addResultToLeaderboard(){
+      const durationSec = (Date.now() - runStartTimeMs)/1000;
+      const data = loadLeaderboard();
+      const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
+      const entry = {
+        name: nameToUse,
+        fishGained: runFishGained,
+        totalFish: unlockedFish,
+        time: durationSec,
+        score: score
+      };
+      data.push(entry);
+      data.sort((a,b)=>{
+        if(b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
+        if(b.score !== a.score) return b.score - a.score;
+        return a.time - b.time;
+      });
+      const top = data.slice(0, 50);
+      saveLeaderboard(top);
+      pushRunToCloud(entry);
+      renderLeaderboard(top);
+    }
+
+    function openGameOver(reason){
+      overlayResultLabel.style.display = 'block';
+      overlayScore.style.display = 'block';
+      overlayScore.textContent = formatNum(score);
+      playAgainBtn.textContent = 'Играть';
+
+      if(reason === 'bomb'){
+        overlayTitle.textContent = 'Бум! Это была бомба';
+        overlaySub.textContent = 'Вы нажали на красный круг.';
+      } else if(reason === 'misses'){
+        overlayTitle.textContent = 'Игра окончена!';
+        overlaySub.textContent = 'Вы потеряли все жизни.';
+      } else {
+        overlayTitle.textContent = 'Игра окончена!';
+        overlaySub.textContent = 'Раунд завершён.';
+      }
+      overlayMode = 'gameOver';
+      gameOverOverlay.classList.add('visible');
+    }
+
+    function endGame(reason=''){
+      roundActive = false;
+      if(timerId){
+        clearInterval(timerId);
+        timerId = null;
+      }
+      circles.forEach(c=>c.classList.remove('active','bomb-visible','green-bonus'));
+      startBtn.disabled = false;
+      addResultToLeaderboard();
+      openGameOver(reason);
+
+      resetUI();
+      // сброс только текущей игры
+      score = 0;
+      diamondsRun = 0;
+      starsRun = 0;
+      scoreEl.textContent = formatNum(0);
+      updateStatsUI();
+
+      misses = 0;
+      updateHearts();
+      pendingContinue = false;
+      startBtn.textContent = 'Играть';
+    }
+
+    function setupRoundState(){
+      roundActive = true;
+      messageEl.textContent = '';
+
+      activeIndex = Math.floor(Math.random()*3);
+      bombRound = false;
+      bombDangerIndex = null;
+      greenBonusIndex = null;
+
+      if(Math.random() < 0.25){
+        bombRound = true;
+        bombDangerIndex = activeIndex;
+      }
+
+      rewards = rewards.map(()=>Math.floor(Math.random()*(35-5+1))+5);
+
+      circles.forEach((btn,idx)=>{
+        btn.classList.remove('active','bomb-visible','green-bonus');
+        const icon = btn.querySelector('.circle-icon');
+        if(idx === activeIndex){
+          btn.classList.add('active');
+          if(bombRound){
+            if(icon) icon.textContent = '⚡';
+          } else {
+            if(icon) icon.textContent = '⭐';
+          }
+        } else {
+          if(icon) icon.textContent = '⚡';
+        }
+      });
+
+      if(bombRound){
+        const btn = circles[activeIndex];
+        btn.classList.add('bomb-visible');
+        const localActive = activeIndex;
+        const visibleTime = currentRoundTimeMs / 2;
+        setTimeout(()=>{
+          if(roundActive && activeIndex === localActive && bombRound){
+            btn.classList.remove('bomb-visible');
+            bombDangerIndex = null;
+            greenBonusIndex = localActive;
+            btn.classList.add('green-bonus');
+            const icon = btn.querySelector('.circle-icon');
+            if(icon) icon.textContent = '💎';
+            rewards[localActive] = 100;
+          }
+        }, visibleTime);
+      }
+    }
+
+    function nextRound(){
+      if(misses >= MAX_MISSES){
+        endGame('misses');
+        return;
+      }
+
+      setupRoundState();
+
+      const thisRoundTime = currentRoundTimeMs;
+      const startTime = performance.now();
+      timerFill.style.transform='scaleX(1)';
+
+      if(timerId){
+        clearInterval(timerId);
+      }
+      timerId = setInterval(()=>{
+        if(!roundActive) return;
+        const elapsed = performance.now() - startTime;
+        const ratio = Math.max(0, 1 - elapsed/thisRoundTime);
+        timerFill.style.transform='scaleX('+ratio+')';
+        if(elapsed >= thisRoundTime){
+          clearInterval(timerId);
+          timerId = null;
+          handleTimeout();
+        }
+      }, 40);
+    }
+
+    function handleMissCommon(){
+      misses++;
+      updateHearts();
+
+      if(misses >= MAX_MISSES){
+        endGame('misses');
+      } else {
+        heartOverlay.classList.add('visible');
+        setTimeout(()=>heartOverlay.classList.remove('visible'), 1600);
+        pendingContinue = true;
+        startBtn.disabled = false;
+        startBtn.textContent = 'Продолжить';
+      }
+    }
+
+    function handleTimeout(){
+      if(!roundActive) return;
+      roundActive = false;
+
+      if(bombRound && bombDangerIndex !== null){
+        bombRound = false;
+      }
+
+      handleMissCommon();
+    }
+
+    function handleCircleClick(e){
+      if(!roundActive) return;
+      const idx = Number(e.currentTarget.dataset.index);
+
+      if(bombDangerIndex !== null && idx === bombDangerIndex){
+        roundActive = false;
+        endGame('bomb');
+        return;
+      }
+
+      if(idx === activeIndex){
+        const reward = rewards[idx];
+        score += reward;
+        totalCoinsAll += reward;
+
+        if(idx === greenBonusIndex){
+          diamondsRun += 1;
+          totalDiamondsAll += 1;
+          showRewardPopup(e.currentTarget, '+100 💎');
+        }else{
+          starsRun += 1;
+          totalStarsAll += 1;
+          showRewardPopup(e.currentTarget, '+'+reward+' ⭐');
+        }
+
+        saveTotals();
+        updateStatsUI();
+
+        scoreEl.textContent = formatNum(score);
+        tryUnlockFish();
+        roundActive = false;
+        bombRound = false;
+        greenBonusIndex = null;
+        nextRound();
+      } else {
+        roundActive = false;
+        handleMissCommon();
+      }
+    }
+
+    circles.forEach(btn=>btn.addEventListener('click',handleCircleClick));
+
+    function startGame(){
+      currentRoundTimeMs = BASE_ROUND_TIME_MS;
+      roundTimeLabel.textContent = (currentRoundTimeMs/1000).toFixed(1) + ' c';
+
+      if(!playerName && !playerNameInput.value.trim()){
+        playerNameInput.value = 'Игрок';
+      }
+      if(!playerName){
+        savePlayerName();
+      }
+
+      startBtn.disabled = true;
+      gameOverOverlay.classList.remove('visible');
+      misses = 0;
+      updateHearts();
+
+      scoreEl.textContent = formatNum(score);
+
+      diamondsRun = 0;
+      starsRun = 0;
+      updateStatsUI();
+
+      runStartTimeMs = Date.now();
+      runStartUnlockedFish = unlockedFish;
+      runFishGained = 0;
+
+      resetUI();
+      updateFishProgress();
+      nextRound();
+    }
+
+    function continueAfterMiss(){
+      pendingContinue = false;
+      heartOverlay.classList.remove('visible');
+      startBtn.disabled = true;
+      startBtn.textContent = 'Играть';
+      messageEl.textContent = '';
+      updateFishProgress();
+      nextRound();
+    }
+
+    function showRulesOverlay(){
+      overlayTitle.textContent = 'Правила';
+      overlaySub.textContent = 'Как играть в “Быстрый клик”';
+      overlayResultLabel.style.display = 'none';
+      overlayScore.style.display = 'none';
+      playAgainBtn.textContent = 'Играть';
+      overlayMode = 'rules';
+      gameOverOverlay.classList.add('visible');
+    }
+
+    function showHelpOverlay(){ helpOverlay.classList.add('visible'); }
+    function hideHelpOverlay(){
+      helpOverlay.classList.remove('visible');
+      helpSeen = true;
+      try{ localStorage.setItem('fastClickHelpSeen','1'); }catch(e){}
+    }
+
+    playAgainBtn.addEventListener('click', ()=>{
+      gameOverOverlay.classList.remove('visible');
+    });
+
+    startBtn.addEventListener('click', ()=>{
+      if(pendingContinue){
+        continueAfterMiss();
+      } else {
+        startGame();
+      }
+    });
+
+    rulesBtn.addEventListener('click', showRulesOverlay);
+
+    helpCloseBtn.addEventListener('click', ()=>{ hideHelpOverlay(); });
+
+    saveNameBtn.addEventListener('click', ()=>{ savePlayerName(); });
+    playerNameInput.addEventListener('click', ()=>{
+      if(playerNameInput.readOnly){
+        playerNameInput.readOnly = false;
+        saveNameBtn.style.display = 'inline-block';
+      }
+    });
+    playerNameInput.addEventListener('input', ()=>{
+      if(!playerNameInput.readOnly){
+        saveNameBtn.style.display = 'inline-block';
+      }
+    });
+    playerNameInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ savePlayerName(); }
+    });
+
+    buildFishGrid();
+    resetUI();
+    loadPlayerName();
+    renderLeaderboard();
+    loadCloudLeaderboard();
+    loadTotals();
+
+    showHelpOverlay();
+  </script>
+</body>
+</html>
