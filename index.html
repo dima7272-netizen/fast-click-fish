@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Быстрый Клик — Рыбный Индекс</title>
   <style>
     * { box-sizing: border-box; }
@@ -25,9 +26,11 @@
       max-width: 720px;
       width: 100%;
       margin-top: 0;
+      position: relative;
+      z-index: 1;
     }
 
-    /* ПАНЕЛЬ СЧЁТОВ (вместо названия) */
+    /* ПАНЕЛЬ СЧЁТОВ (десктоп как было) */
     .stats-bar {
       display: flex;
       justify-content: space-between;
@@ -253,6 +256,7 @@
       justify-content: center;
       color: rgba(148, 163, 184, 0.9);
       font-size: 28px;
+      touch-action: manipulation;
     }
 
     .circle.active:not(.bomb-visible):not(.green-bonus) {
@@ -384,7 +388,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.22s ease;
-      z-index: 10;
+      z-index: 9999;
       overflow-y: auto;
       padding: 20px 0;
     }
@@ -529,7 +533,7 @@
       100% { transform:scale(1.0) translateY(-18px); opacity:0; }
     }
 
-    /* FISH PANEL */
+    /* FISH PANEL (десктоп фикс) */
     .fish-card {
       position: fixed;
       top: 14px;
@@ -660,7 +664,7 @@
       100% { transform:scale(1); }
     }
 
-    /* LEADERBOARD */
+    /* LEADERBOARD (десктоп фикс) */
     .leaderboard-panel {
       position: fixed;
       top: 14px;
@@ -750,87 +754,113 @@
       gap: 8px;
     }
 
-@media (max-width: 880px) {
-  /* справа панель рыб убираем на планшетах и телефонах */
-  .fish-card {
-    display: none;
-  }
-}
+    /* ====== MOBILE UI ====== */
+    .mobile-top-buttons{
+      display:none;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding-top: env(safe-area-inset-top);
+      margin: 0 -6px 10px;
+    }
+    .mobile-top-buttons .btn-row{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+    }
+    .mobile-ui-btn{
+      flex:1;
+      max-width:160px;
+      border-radius:999px;
+      border:1px solid rgba(55,65,81,0.9);
+      background:rgba(2,6,23,0.95);
+      color:#e5e7eb;
+      font-size:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    }
 
-/* Телефоны — вертикальный режим */
-@media (max-width: 520px) {
-  body {
-    align-items: flex-start;
-    padding: 8px 0 16px;
-  }
+    .stats-overlay-content .stats-bar{
+      margin: 6px 0 0;
+    }
 
-  .wrapper {
-    max-width: 420px;
-    margin-top: 8px;
-    padding: 0 10px;
-  }
+    .overlay.fullscreen-mobile{
+      display:none; /* only mobile */
+    }
 
-  .game-card {
-    margin-top: 16px;
-    min-height: auto;
-    padding: 16px 12px 20px;
-  }
+    .fish-card-mobile{
+      display:none;
+      position: static;
+      width: 100%;
+      margin-top: 12px;
+      background: radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 55%), #020919;
+      border-radius: 18px;
+      padding: 14px 12px 12px;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9), 0 12px 24px rgba(0, 0, 0, 0.7);
+      text-align:left;
+    }
+    .fish-card-mobile .fish-grid{
+      max-height:none;
+      overflow:visible;
+    }
 
-  /* Верхняя панель статистики — в колонку */
-  .stats-bar {
-    flex-direction: column;
-    gap: 8px;
-  }
+    @media (max-width: 880px) { 
+      /* на планшетах оставим как раньше: рыбная панель прячется */
+      .fish-card { display:none; } 
+    }
 
-  .stat-card {
-    padding: 8px 10px;
-  }
+    @media (max-width: 520px) {
+      body{ padding-bottom: 12px; align-items:flex-start; }
+      .wrapper{ padding: 0 10px; max-width: 100%; }
+      .game-card{
+        width: 100%;
+        min-height: auto;
+        margin-top: 10px;
+        padding: 16px 12px 18px;
+        border-radius: 22px;
+      }
+      .circles-row { gap:14px; }
+      .circle { width:96px; height:96px; font-size:24px; }
+      .run-inline-stats{ gap:10px; flex-wrap:wrap; }
+      .run-inline-item{ flex:1; justify-content:center; min-width:140px; }
 
-  /* Круги чуть меньше и ближе друг к другу */
-  .circles-row {
-    gap: 14px;
-    margin-bottom: 12px;
-  }
+      /* скрываем десктопные панели */
+      .leaderboard-panel{ display:none; }
+      .fish-card{ display:none; }
+      .stats-bar{ display:none; }
 
-  .circle {
-    width: 90px;
-    height: 90px;
-    font-size: 24px;
-  }
+      /* включаем мобильные */
+      .mobile-top-buttons{ display:block; }
+      .fish-card-mobile{ display:block; }
 
-  /* Внутренняя статистика раунда — компактнее */
-  .run-inline-stats {
-    gap: 10px;
-    margin: 6px 0 10px;
-  }
+      /* стат-блок в одну строку внутри оверлея */
+      .stats-overlay-content .stats-bar{ display:flex; flex-direction:row; gap:8px; }
+      .stats-overlay-content .stat-card{ padding:8px 8px; gap:8px; border-radius:14px; }
+      .stats-overlay-content .stat-icon{ width:28px; height:28px; font-size:16px; }
+      .stats-overlay-content .stat-current{ font-size:16px; }
+      .stats-overlay-content .stat-total{ font-size:10px; }
 
-  .run-inline-item {
-    padding: 5px 8px;
-    font-size: 11px;
-  }
-
-  /* Лидерборд слева прячем на телефонах */
-  .leaderboard-panel {
-    display: none;
-  }
-
-  /* Немного уменьшаем шрифты, чтобы всё помещалось */
-  .score-value {
-    font-size: 30px;
-  }
-
-  .leaderboard-title {
-    font-size: 18px;
-  }
-}
-
+      /* оверлеи на весь экран */
+      .overlay{
+        position: fixed !important;
+        inset: 0 !important;
+        padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+        border-radius: 0 !important;
+      }
+      .overlay-card{
+        max-width: none;
+        border-radius: 18px;
+      }
+      .overlay.fullscreen-mobile{ display:flex; }
+    }
   </style>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
 </head>
 <body>
-  <!-- ЛИДЕРБОРД -->
+  <!-- ЛИДЕРБОРД (десктоп) -->
   <div class="leaderboard-panel">
     <div class="leaderboard-title">Топ игр</div>
     <div class="leaderboard-table-wrapper">
@@ -854,7 +884,7 @@
     </div>
   </div>
 
-  <!-- ПАНЕЛЬ РЫБ -->
+  <!-- ПАНЕЛЬ РЫБ (десктоп) -->
   <div class="fish-card">
     <div class="fish-header">
       <div>
@@ -877,7 +907,15 @@
 
   <!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
   <div class="wrapper">
-    <!-- ПАНЕЛЬ МОНЕТ/АЛМАЗОВ/ЗВЁЗД -->
+    <!-- МОБИЛЬНЫЕ КНОПКИ -->
+    <div class="mobile-top-buttons">
+      <div class="btn-row">
+        <button class="mobile-ui-btn" id="openStatsBtn">Статистика</button>
+        <button class="mobile-ui-btn" id="openTopBtn">Топ игр</button>
+      </div>
+    </div>
+
+    <!-- ПАНЕЛЬ МОНЕТ/АЛМАЗОВ/ЗВЁЗД (десктоп) -->
     <div class="stats-bar">
       <div class="stat-card">
         <div class="stat-icon coins">💰</div>
@@ -1030,6 +1068,81 @@
         <div class="heart-overlay-icon">💔</div>
       </div>
     </div>
+
+    <!-- РЫБЫ ДЛЯ МОБИЛЬНОЙ -->
+    <div class="fish-card-mobile" id="fishCardMobile">
+      <div class="fish-header">
+        <div>
+          <div class="fish-nick-row">
+            <span class="label">Ник:</span>
+            <input id="playerNameInputMobile" placeholder="Ваш ник" />
+            <button id="saveNameBtnMobile">OK</button>
+          </div>
+        </div>
+        <div class="fish-level-box">
+          <div class="fish-level-label">Уровень</div>
+          <div class="fish-progress-text" id="fishProgressTextMobile">0 / 21</div>
+        </div>
+      </div>
+      <div class="fish-progress-bar"><div class="fish-progress-fill" id="fishProgressFillMobile"></div></div>
+      <div class="fish-grid" id="fishGridMobile"></div>
+    </div>
+  </div>
+
+  <!-- МОБИЛЬНЫЙ ОВЕРЛЕЙ СТАТИСТИКИ -->
+  <div class="overlay fullscreen-mobile" id="statsOverlay">
+    <div class="overlay-card stats-overlay-content">
+      <div class="overlay-title">Статистика</div>
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-icon coins">💰</div>
+          <div class="stat-main">
+            <div class="stat-title">Монеты</div>
+            <div class="stat-current" id="coinsRunMobile">0</div>
+            <div class="stat-total">Всего: <span id="coinsTotalMobile">0</span></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon diamonds">💎</div>
+          <div class="stat-main">
+            <div class="stat-title">Алмазы</div>
+            <div class="stat-current" id="diamondsRunMobile">0</div>
+            <div class="stat-total">Всего: <span id="diamondsTotalMobile">0</span></div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stars">⭐</div>
+          <div class="stat-main">
+            <div class="stat-title">Звёзды</div>
+            <div class="stat-current" id="starsRunMobile">0</div>
+            <div class="stat-total">Всего: <span id="starsTotalMobile">0</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="overlay-btn" id="closeStatsBtn">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- МОБИЛЬНЫЙ ОВЕРЛЕЙ ТОПА -->
+  <div class="overlay fullscreen-mobile" id="topOverlay">
+    <div class="overlay-card" style="width:100%; text-align:left;">
+      <div class="overlay-title" style="text-align:center;">Топ игр</div>
+      <div class="leaderboard-table-wrapper" style="max-height:60vh;">
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+          <thead>
+            <tr>
+              <th style="padding:4px 6px;">#</th>
+              <th style="padding:4px 6px;">Имя</th>
+              <th style="padding:4px 6px;">Рыб</th>
+              <th style="padding:4px 6px;">Время</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBodyMobile"></tbody>
+        </table>
+      </div>
+      <div class="leaderboard-mybest" id="myBestBlockMobile"></div>
+      <button class="overlay-btn" id="closeTopBtn" style="width:100%; margin-top:10px;">Закрыть</button>
+    </div>
   </div>
 
   <script>
@@ -1068,35 +1181,33 @@
       }
     }
 
-async function loadCloudLeaderboard() {
-  try {
-    const snap = await db.collection(LEADERBOARD_COLLECTION)
-      .orderBy("fishGained", "desc")
-      .limit(100)
-      .get();
+    async function loadCloudLeaderboard() {
+      try {
+        const snap = await db.collection(LEADERBOARD_COLLECTION)
+          .orderBy("fishGained", "desc")
+          .orderBy("score", "desc")
+          .orderBy("time", "asc")
+          .limit(100)
+          .get();
 
-    cloudLeaderboard = [];
-    snap.forEach(doc => {
-      const d = doc.data();
-      cloudLeaderboard.push({
-        name: d.name || "Игрок",
-        fishGained: d.fishGained || 0,
-        totalFish: d.totalFish || 0,
-        time: d.time || 0,
-        score: d.score || 0
-      });
-    });
+        cloudLeaderboard = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          cloudLeaderboard.push({
+            name: d.name || "Игрок",
+            fishGained: d.fishGained || 0,
+            totalFish: d.totalFish || 0,
+            time: d.time || 0,
+            score: d.score || 0
+          });
+        });
 
-    renderLeaderboard(cloudLeaderboard);
-  } catch (e) {
-    console.warn("Не удалось загрузить онлайн-лидерборд из Firestore", e);
-    // если облако недоступно — показываем хотя бы локальный топ
-    renderLeaderboard(loadLeaderboard());
-  }
-}
-
-
-
+        renderLeaderboard(cloudLeaderboard);
+      } catch (e) {
+        console.warn("Не удалось загрузить онлайн-лидерборд из Firestore", e);
+        renderLeaderboard(loadLeaderboard());
+      }
+    }
 
     const MAX_MISSES = 3;
     const BASE_ROUND_TIME_MS = 2000;
@@ -1127,10 +1238,21 @@ async function loadCloudLeaderboard() {
     const fishProgressText = document.getElementById('fishProgressText');
     const fishProgressFill = document.getElementById('fishProgressFill');
 
+    // mobile fish elements
+    const fishGridMobile = document.getElementById('fishGridMobile');
+    const fishProgressTextMobile = document.getElementById('fishProgressTextMobile');
+    const fishProgressFillMobile = document.getElementById('fishProgressFillMobile');
+    const playerNameInputMobile = document.getElementById('playerNameInputMobile');
+    const saveNameBtnMobile = document.getElementById('saveNameBtnMobile');
+
     const playerNameInput = document.getElementById('playerNameInput');
     const saveNameBtn = document.getElementById('saveNameBtn');
     const leaderboardBody = document.getElementById('leaderboardBody');
     const myBestBlock = document.getElementById('myBestBlock');
+
+    // mobile leaderboard elements
+    const leaderboardBodyMobile = document.getElementById('leaderboardBodyMobile');
+    const myBestBlockMobile = document.getElementById('myBestBlockMobile');
 
     const coinsRunEl = document.getElementById('coinsRun');
     const coinsTotalEl = document.getElementById('coinsTotal');
@@ -1138,6 +1260,14 @@ async function loadCloudLeaderboard() {
     const diamondsTotalEl = document.getElementById('diamondsTotal');
     const starsRunEl = document.getElementById('starsRun');
     const starsTotalEl = document.getElementById('starsTotal');
+
+    // mobile stats elements
+    const coinsRunMobile = document.getElementById('coinsRunMobile');
+    const coinsTotalMobile = document.getElementById('coinsTotalMobile');
+    const diamondsRunMobile = document.getElementById('diamondsRunMobile');
+    const diamondsTotalMobile = document.getElementById('diamondsTotalMobile');
+    const starsRunMobile = document.getElementById('starsRunMobile');
+    const starsTotalMobile = document.getElementById('starsTotalMobile');
 
     const fishList = [
       { name: 'Рыба-клоун', emoji: '🐠' },
@@ -1188,10 +1318,9 @@ async function loadCloudLeaderboard() {
     let runFishGained = 0;
 
     let fishSlots = [];
+    let fishSlotsMobile = [];
     let playerName = '';
-    let helpSeen = false;
     let pendingContinue = false;
-    let overlayMode = null;
 
     // алмазы / звёзды и глобальные счётчики
     let diamondsRun = 0;
@@ -1201,12 +1330,20 @@ async function loadCloudLeaderboard() {
     let totalStarsAll = 0;
 
     function updateStatsUI(){
-      coinsRunEl.textContent = formatNum(totalCoinsAll);
-      coinsTotalEl.textContent = formatNum(score);
-      diamondsRunEl.textContent = formatNum(totalDiamondsAll);
-      diamondsTotalEl.textContent = formatNum(diamondsRun);
-      starsRunEl.textContent = formatNum(totalStarsAll);
-      starsTotalEl.textContent = formatNum(starsRun);
+      if(coinsRunEl) coinsRunEl.textContent = formatNum(totalCoinsAll);
+      if(coinsTotalEl) coinsTotalEl.textContent = formatNum(score);
+      if(diamondsRunEl) diamondsRunEl.textContent = formatNum(totalDiamondsAll);
+      if(diamondsTotalEl) diamondsTotalEl.textContent = formatNum(diamondsRun);
+      if(starsRunEl) starsRunEl.textContent = formatNum(totalStarsAll);
+      if(starsTotalEl) starsTotalEl.textContent = formatNum(starsRun);
+
+      if(coinsRunMobile) coinsRunMobile.textContent = formatNum(totalCoinsAll);
+      if(coinsTotalMobile) coinsTotalMobile.textContent = formatNum(score);
+      if(diamondsRunMobile) diamondsRunMobile.textContent = formatNum(totalDiamondsAll);
+      if(diamondsTotalMobile) diamondsTotalMobile.textContent = formatNum(diamondsRun);
+      if(starsRunMobile) starsRunMobile.textContent = formatNum(totalStarsAll);
+      if(starsTotalMobile) starsTotalMobile.textContent = formatNum(starsRun);
+
       const dRunGame = document.getElementById('diamondsRunGame');
       const sRunGame = document.getElementById('starsRunGame');
       if(dRunGame) dRunGame.textContent = formatNum(diamondsRun);
@@ -1230,9 +1367,10 @@ async function loadCloudLeaderboard() {
       }catch(e){}
     }
 
-    function buildFishGrid(){
-      fishGrid.innerHTML='';
-      fishSlots = [];
+    function buildFishGrid(targetEl, slotsArr){
+      if(!targetEl) return;
+      targetEl.innerHTML='';
+      slotsArr.length = 0;
       fishList.forEach((fish,index)=>{
         const slot=document.createElement('div');
         slot.className='fish-slot';
@@ -1241,37 +1379,49 @@ async function loadCloudLeaderboard() {
           <div class="fish-emoji">${fish.emoji}</div>
           <div class="fish-name">${fish.name}</div>
           <div class="fish-req">${formatNum(fish.requiredScore)} монет</div>`;
-        fishGrid.appendChild(slot);
-        fishSlots.push({slot});
+        targetEl.appendChild(slot);
+        slotsArr.push({slot});
       });
-      updateFishProgress();
     }
 
     function updateFishProgress(){
       const total = fishList.length;
-      fishProgressText.textContent = unlockedFish + ' / ' + total;
+      if(fishProgressText) fishProgressText.textContent = unlockedFish + ' / ' + total;
+      if(fishProgressTextMobile) fishProgressTextMobile.textContent = unlockedFish + ' / ' + total;
       const ratio = total === 0 ? 0 : unlockedFish / total;
-      fishProgressFill.style.width = (ratio * 100) + '%';
+      if(fishProgressFill) fishProgressFill.style.width = (ratio * 100) + '%';
+      if(fishProgressFillMobile) fishProgressFillMobile.style.width = (ratio * 100) + '%';
 
-      fishSlots.forEach((fs, index)=>{
-        if(index < unlockedFish){
-          fs.slot.classList.add('unlocked');
-        } else {
-          fs.slot.classList.remove('unlocked');
-        }
-      });
+      const apply = (arr)=>{
+        arr.forEach((fs, index)=>{
+          if(index < unlockedFish){
+            fs.slot.classList.add('unlocked');
+          } else {
+            fs.slot.classList.remove('unlocked');
+          }
+        });
+      };
+      apply(fishSlots);
+      apply(fishSlotsMobile);
     }
 
     function tryUnlockFish(){
       const possible = Math.min(Math.floor(score / 1000), fishList.length);
       if(possible > unlockedFish){
         const newly = possible - unlockedFish;
-        for(let i = unlockedFish; i < possible; i++){
-          const fs = fishSlots[i];
-          if(!fs) continue;
-          fs.slot.classList.add('unlocked','just-unlocked');
-          setTimeout(()=>fs.slot.classList.remove('just-unlocked'), 700);
-        }
+
+        const animateNew = (arr)=>{
+          for(let i = unlockedFish; i < possible; i++){
+            const fs = arr[i];
+            if(!fs) continue;
+            fs.slot.classList.add('unlocked','just-unlocked');
+            setTimeout(()=>fs.slot.classList.remove('just-unlocked'), 700);
+          }
+        };
+
+        animateNew(fishSlots);
+        animateNew(fishSlotsMobile);
+
         unlockedFish = possible;
         runFishGained = unlockedFish - runStartUnlockedFish;
 
@@ -1320,27 +1470,49 @@ async function loadCloudLeaderboard() {
         const saved = localStorage.getItem('fastClickPlayerName');
         if(saved){
           playerName = saved;
-          playerNameInput.value = saved;
-          playerNameInput.readOnly = true;
-          saveNameBtn.style.display = 'none';
+          if(playerNameInput){
+            playerNameInput.value = saved;
+            playerNameInput.readOnly = true;
+            saveNameBtn.style.display = 'none';
+          }
+          if(playerNameInputMobile){
+            playerNameInputMobile.value = saved;
+            playerNameInputMobile.readOnly = true;
+            saveNameBtnMobile.style.display = 'none';
+          }
         } else {
-          playerNameInput.readOnly = false;
-          saveNameBtn.style.display = 'inline-block';
+          if(playerNameInput){
+            playerNameInput.readOnly = false;
+            saveNameBtn.style.display = 'inline-block';
+          }
+          if(playerNameInputMobile){
+            playerNameInputMobile.readOnly = false;
+            saveNameBtnMobile.style.display = 'inline-block';
+          }
         }
       }catch(e){
-        playerNameInput.readOnly = false;
+        if(playerNameInput) playerNameInput.readOnly = false;
+        if(playerNameInputMobile) playerNameInputMobile.readOnly = false;
       }
     }
 
-    function savePlayerName(){
-      playerName = playerNameInput.value.trim() || 'Игрок';
+    function savePlayerName(fromMobile=false){
+      const inp = fromMobile ? playerNameInputMobile : playerNameInput;
+      playerName = (inp && inp.value.trim()) || 'Игрок';
       try{
         localStorage.setItem('fastClickPlayerName', playerName);
       }catch(e){}
-      playerNameInput.value = playerName;
-      playerNameInput.readOnly = true;
-      saveNameBtn.style.display = 'none';
-      renderLeaderboard();
+      if(playerNameInput){
+        playerNameInput.value = playerName;
+        playerNameInput.readOnly = true;
+        saveNameBtn.style.display = 'none';
+      }
+      if(playerNameInputMobile){
+        playerNameInputMobile.value = playerName;
+        playerNameInputMobile.readOnly = true;
+        saveNameBtnMobile.style.display = 'none';
+      }
+      renderLeaderboard(cloudLeaderboard.length ? cloudLeaderboard : loadLeaderboard());
     }
 
     function loadLeaderboard(){
@@ -1366,10 +1538,10 @@ async function loadCloudLeaderboard() {
       return `${String(m).padStart(2,'0')}:${String(s2).padStart(2,'0')}.${ms}`;
     }
 
-    function renderMyBest(data){
-      if(!myBestBlock) return;
+    function renderMyBest(data, target){
+      if(!target) return;
       let best = null;
-      const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
+      const nameToUse = playerName || (playerNameInput && playerNameInput.value.trim()) || 'Игрок';
       data.forEach(row=>{
         if(row.name !== nameToUse) return;
         if(!best){
@@ -1383,75 +1555,97 @@ async function loadCloudLeaderboard() {
       });
 
       if(!best){
-        myBestBlock.innerHTML = `
+        target.innerHTML = `
           <div class="leaderboard-mybest-title">Мой лучший результат</div>
           <div class="leaderboard-mybest-row">
             <span>Пока нет данных.</span>
           </div>`;
       } else {
-        myBestBlock.innerHTML = `
+        target.innerHTML = `
           <div class="leaderboard-mybest-title">Мой лучший результат</div>
           <div class="leaderboard-mybest-row">
-            <span style=\"font-size:13px;\">Рыб всего: <b style=\"font-size:16px;\">${best.totalFish}</b></span>
-            <span style=\"font-size:13px;\">Время: <b style=\"font-size:16px;\">${formatTime(best.time)}</b></span>
+            <span style="font-size:13px;">Рыб всего: <b style="font-size:16px;">${best.totalFish}</b></span>
+            <span style="font-size:13px;">Время: <b style="font-size:16px;">${formatTime(best.time)}</b></span>
           </div>`;
       }
     }
 
-function renderLeaderboard(data){
-  const rows = data || [];
-  leaderboardBody.innerHTML = '';
+    function renderLeaderboard(data){
+      const rows = data || [];
+      // desktop table
+      if(leaderboardBody){
+        leaderboardBody.innerHTML = '';
+        rows.forEach((row, idx) => {
+          let rowClass = '';
+          if (idx === 0) rowClass = 'gold-row';
+          else if (idx === 1) rowClass = 'silver-row';
+          else if (idx === 2) rowClass = 'bronze-row';
+          else rowClass = 'lb-other';
 
-  rows.forEach((row, idx) => {
-    let rowClass = '';
-    if (idx === 0) rowClass = 'gold-row';
-    else if (idx === 1) rowClass = 'silver-row';
-    else if (idx === 2) rowClass = 'bronze-row';
-    else rowClass = 'lb-other';
+          const tr = document.createElement('tr');
+          tr.className = rowClass;
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${row.name}</td>
+            <td>${row.totalFish}</td>
+            <td>${formatTime(row.time)}</td>`;
+          leaderboardBody.appendChild(tr);
+        });
+      }
+      renderMyBest(rows, myBestBlock);
 
-    const tr = document.createElement('tr');
-    tr.className = rowClass;
-    tr.innerHTML = `
-      <td>${idx + 1}</td>
-      <td>${row.name}</td>
-      <td>${row.totalFish}</td>
-      <td>${formatTime(row.time)}</td>`;
-    leaderboardBody.appendChild(tr);
-  });
+      // mobile table
+      if(leaderboardBodyMobile){
+        leaderboardBodyMobile.innerHTML = '';
+        rows.forEach((row, idx) => {
+          let rowClass = '';
+          if (idx === 0) rowClass = 'gold-row';
+          else if (idx === 1) rowClass = 'silver-row';
+          else if (idx === 2) rowClass = 'bronze-row';
+          else rowClass = 'lb-other';
 
-  renderMyBest(rows);
-}
+          const tr = document.createElement('tr');
+          tr.className = rowClass;
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${row.name}</td>
+            <td>${row.totalFish}</td>
+            <td>${formatTime(row.time)}</td>`;
+          leaderboardBodyMobile.appendChild(tr);
+        });
+      }
+      renderMyBest(rows, myBestBlockMobile);
+    }
 
+    function addResultToLeaderboard(){
+      const durationSec = (Date.now() - runStartTimeMs) / 1000;
+      const nameToUse = playerName || (playerNameInput && playerNameInput.value.trim()) || 'Игрок';
 
-function addResultToLeaderboard(){
-  const durationSec = (Date.now() - runStartTimeMs) / 1000;
-  const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
+      const entry = {
+        name: nameToUse,
+        fishGained: runFishGained,
+        totalFish: unlockedFish,
+        time: durationSec,
+        score: score
+      };
 
-  const entry = {
-    name: nameToUse,
-    fishGained: runFishGained,
-    totalFish: unlockedFish,
-    time: durationSec,
-    score: score
-  };
+      pushRunToCloud(entry);
 
-  // отправляем в Firestore
-  pushRunToCloud(entry);
+      let data = cloudLeaderboard ? cloudLeaderboard.slice() : [];
+      data.push(entry);
 
-  // обновляем локальную копию облачного топа
-  let data = cloudLeaderboard ? cloudLeaderboard.slice() : [];
-  data.push(entry);
+      data.sort((a, b) => {
+        if (b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
+        if (b.score !== a.score) return b.score - a.score;
+        return a.time - b.time;
+      });
 
-  data.sort((a, b) => {
-    if (b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
-    if (b.score !== a.score) return b.score - a.score;
-    return a.time - b.time;
-  });
+      cloudLeaderboard = data.slice(0, 100);
+      renderLeaderboard(cloudLeaderboard);
 
-  cloudLeaderboard = data.slice(0, 100);
-  renderLeaderboard(cloudLeaderboard);
-}
-
+      // сохраняем локально как резерв
+      saveLeaderboard(cloudLeaderboard.slice(0,50));
+    }
 
     function openGameOver(reason){
       overlayResultLabel.style.display = 'block';
@@ -1469,7 +1663,6 @@ function addResultToLeaderboard(){
         overlayTitle.textContent = 'Игра окончена!';
         overlaySub.textContent = 'Раунд завершён.';
       }
-      overlayMode = 'gameOver';
       gameOverOverlay.classList.add('visible');
     }
 
@@ -1648,19 +1841,18 @@ function addResultToLeaderboard(){
       currentRoundTimeMs = BASE_ROUND_TIME_MS;
       roundTimeLabel.textContent = (currentRoundTimeMs/1000).toFixed(1) + ' c';
 
-      if(!playerName && !playerNameInput.value.trim()){
-        playerNameInput.value = 'Игрок';
+      if(!playerName && !(playerNameInput && playerNameInput.value.trim()) && !(playerNameInputMobile && playerNameInputMobile.value.trim())){
+        if(playerNameInput) playerNameInput.value = 'Игрок';
+        if(playerNameInputMobile) playerNameInputMobile.value = 'Игрок';
       }
       if(!playerName){
-        savePlayerName();
+        savePlayerName(window.innerWidth <= 520);
       }
 
       startBtn.disabled = true;
       gameOverOverlay.classList.remove('visible');
       misses = 0;
       updateHearts();
-
-      scoreEl.textContent = formatNum(score);
 
       diamondsRun = 0;
       starsRun = 0;
@@ -1691,14 +1883,12 @@ function addResultToLeaderboard(){
       overlayResultLabel.style.display = 'none';
       overlayScore.style.display = 'none';
       playAgainBtn.textContent = 'Играть';
-      overlayMode = 'rules';
       gameOverOverlay.classList.add('visible');
     }
 
     function showHelpOverlay(){ helpOverlay.classList.add('visible'); }
     function hideHelpOverlay(){
       helpOverlay.classList.remove('visible');
-      helpSeen = true;
       try{ localStorage.setItem('fastClickHelpSeen','1'); }catch(e){}
     }
 
@@ -1715,40 +1905,62 @@ function addResultToLeaderboard(){
     });
 
     rulesBtn.addEventListener('click', showRulesOverlay);
+    helpCloseBtn.addEventListener('click', hideHelpOverlay);
 
-    helpCloseBtn.addEventListener('click', ()=>{ hideHelpOverlay(); });
+    // name saving desktop+mobile
+    saveNameBtn && saveNameBtn.addEventListener('click', ()=> savePlayerName(false));
+    saveNameBtnMobile && saveNameBtnMobile.addEventListener('click', ()=> savePlayerName(true));
 
-    saveNameBtn.addEventListener('click', ()=>{ savePlayerName(); });
-    playerNameInput.addEventListener('click', ()=>{
-      if(playerNameInput.readOnly){
-        playerNameInput.readOnly = false;
-        saveNameBtn.style.display = 'inline-block';
-      }
-    });
-    playerNameInput.addEventListener('input', ()=>{
-      if(!playerNameInput.readOnly){
-        saveNameBtn.style.display = 'inline-block';
-      }
-    });
-    playerNameInput.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter'){ savePlayerName(); }
-    });
+    function enableNameEdit(inp, btn){
+      if(!inp) return;
+      inp.addEventListener('click', ()=>{
+        if(inp.readOnly){
+          inp.readOnly = false;
+          if(btn) btn.style.display = 'inline-block';
+        }
+      });
+      inp.addEventListener('input', ()=>{
+        if(!inp.readOnly && btn) btn.style.display = 'inline-block';
+      });
+      inp.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ savePlayerName(inp===playerNameInputMobile); }
+      });
+    }
+    enableNameEdit(playerNameInput, saveNameBtn);
+    enableNameEdit(playerNameInputMobile, saveNameBtnMobile);
 
-    buildFishGrid();
+    // mobile overlays toggles
+    const statsOverlay = document.getElementById('statsOverlay');
+    const topOverlay = document.getElementById('topOverlay');
+    const openStatsBtn = document.getElementById('openStatsBtn');
+    const openTopBtn = document.getElementById('openTopBtn');
+    const closeStatsBtn = document.getElementById('closeStatsBtn');
+    const closeTopBtn = document.getElementById('closeTopBtn');
+
+    function openOverlay(el){
+      if(!el) return;
+      el.classList.add('visible');
+      document.body.style.overflow='hidden';
+    }
+    function closeOverlay(el){
+      if(!el) return;
+      el.classList.remove('visible');
+      document.body.style.overflow='';
+    }
+
+    openStatsBtn && openStatsBtn.addEventListener('click', ()=> openOverlay(statsOverlay));
+    openTopBtn && openTopBtn.addEventListener('click', ()=> openOverlay(topOverlay));
+    closeStatsBtn && closeStatsBtn.addEventListener('click', ()=> closeOverlay(statsOverlay));
+    closeTopBtn && closeTopBtn.addEventListener('click', ()=> closeOverlay(topOverlay));
+
+    // init
+    buildFishGrid(fishGrid, fishSlots);
+    buildFishGrid(fishGridMobile, fishSlotsMobile);
+
     resetUI();
     loadPlayerName();
-    function savePlayerName(){
-  playerName = playerNameInput.value.trim() || 'Игрок';
-  try{
-    localStorage.setItem('fastClickPlayerName', playerName);
-  }catch(e){}
-  playerNameInput.value = playerName;
-  playerNameInput.readOnly = true;
-  saveNameBtn.style.display = 'none';
-  renderLeaderboard(cloudLeaderboard);
-}
-
-    loadCloudLeaderboard();
+    renderLeaderboard(loadLeaderboard()); // fast local paint
+    loadCloudLeaderboard();              // then cloud overwrite
     loadTotals();
 
     showHelpOverlay();
