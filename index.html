@@ -3,6 +3,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Быстрый Клик — Рыбный Индекс</title>
   <style>
     * { box-sizing: border-box; }
@@ -25,17 +26,45 @@
       max-width: 720px;
       width: 100%;
       margin-top: 0;
+      position: relative;
+      z-index: 1;
     }
 
-    /* ПАНЕЛЬ СЧЁТОВ (вместо названия) */
+    /* МОБИЛЬНЫЕ КНОПКИ (только мобила) */
+    .mobile-top-buttons{
+      display:none;
+      gap:8px;
+      justify-content:center;
+      margin-bottom:10px;
+    }
+    .mobile-btn{
+      border-radius:999px;
+      border:none;
+      padding:8px 14px;
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      cursor:pointer;
+      background:rgba(8,12,26,0.9);
+      color:#e5e7eb;
+      box-shadow:0 0 0 1px rgba(55,65,81,0.9), 0 8px 18px rgba(0,0,0,0.7);
+    }
+
+    /* ПАНЕЛЬ СЧЁТОВ — ВСЕГДА ОДНА СТРОКА НА ДЕСКТОПЕ */
     .stats-bar {
       display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
       justify-content: space-between;
+      align-items: stretch;
       gap: 12px;
       margin-bottom: 12px;
+      width: 100%;
     }
     .stat-card {
-      flex: 1;
+      flex: 1 1 0;
+      min-width: 0;
       background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
       border-radius: 18px;
       padding: 10px 14px;
@@ -66,9 +95,7 @@
       background: radial-gradient(circle at 30% 20%, #fdf2ff, #e879f9 40%, #a21caf 100%);
       color:#3b0a40;
     }
-    .stat-main {
-      text-align:left;
-    }
+    .stat-main { text-align:left; }
     .stat-title {
       font-size:11px;
       opacity:0.78;
@@ -80,10 +107,7 @@
       font-weight:800;
       margin-top:1px;
     }
-    .stat-total {
-      font-size:11px;
-      opacity:0.78;
-    }
+    .stat-total { font-size:11px; opacity:0.78; }
 
     .game-card {
       min-height: 900px;
@@ -200,12 +224,12 @@
       box-shadow: 0 0 14px rgba(250, 204, 21, 0.5);
     }
 
-
     .run-inline-stats {
       display:flex;
       justify-content:center;
       gap:16px;
       margin:10px 0 14px;
+      flex-wrap: wrap;
     }
     .run-inline-item {
       display:flex;
@@ -217,12 +241,8 @@
       border:1px solid rgba(55,65,81,0.9);
       font-size:12px;
     }
-    .run-inline-icon {
-      font-size:16px;
-    }
-    .run-inline-label {
-      opacity:0.78;
-    }
+    .run-inline-icon { font-size:16px; }
+    .run-inline-label { opacity:0.78; }
     .run-inline-value {
       font-weight:700;
       color:#e5f9ff;
@@ -269,9 +289,7 @@
       animation: pulseGreen 0.9s infinite;
     }
 
-    .circle.active:hover {
-      transform: translateY(-3px) scale(1.06);
-    }
+    .circle.active:hover { transform: translateY(-3px) scale(1.06); }
 
     .circle.bomb-visible {
       background: radial-gradient(circle at 30% 20%, #fee2e2, #fb1f41 45%, #7f1d1d 100%);
@@ -350,10 +368,7 @@
       cursor: pointer;
       opacity: 0.85;
     }
-    #rulesBtn:hover {
-      color: #e5e7eb;
-      opacity: 1;
-    }
+    #rulesBtn:hover { color: #e5e7eb; opacity: 1; }
 
     .reward-popup {
       position: absolute;
@@ -374,8 +389,9 @@
       100% { opacity:0; transform:translate(-50%,-38px) scale(0.9); }
     }
 
+    /* ОВЕРЛЕИ: базово fixed чтобы на мобиле точно было на весь экран */
     .overlay {
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: radial-gradient(circle at top, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.98));
       display: flex;
@@ -384,7 +400,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.22s ease;
-      z-index: 10;
+      z-index: 100;
       overflow-y: auto;
       padding: 20px 0;
     }
@@ -397,10 +413,11 @@
       text-align: center;
       box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.35), 0 24px 40px rgba(0, 0, 0, 0.9);
       max-width: 540px;
-      width: 100%;
+      width: calc(100% - 24px);
       display: flex;
       flex-direction: column;
       gap: 8px;
+      margin: 0 auto;
     }
     .overlay-icon {
       font-size: 64px;
@@ -507,7 +524,7 @@
     .help-footer { font-size: 14px; opacity: 0.95; margin-top: 8px; }
 
     .heart-overlay {
-      position:absolute;
+      position:fixed;
       inset:0;
       display:flex;
       align-items:center;
@@ -515,7 +532,7 @@
       pointer-events:none;
       opacity:0;
       transition:opacity 0.2s ease;
-      z-index:8;
+      z-index:90;
     }
     .heart-overlay.visible { opacity:1; }
     .heart-overlay-icon {
@@ -696,9 +713,7 @@
       padding: 4px 6px;
       text-align: left;
     }
-    .leaderboard-panel thead {
-      background: rgba(15,23,42,0.98);
-    }
+    .leaderboard-panel thead { background: rgba(15,23,42,0.98); }
     .leaderboard-panel th {
       border-bottom: 1px solid rgba(55,65,81,0.9);
       font-weight: 700;
@@ -725,10 +740,7 @@
       text-shadow: 0 0 6px rgba(248, 153, 96, 0.9);
       font-weight: 600;
     }
-    .lb-other td {
-      color: #9ca3af;
-      opacity: 0.9;
-    }
+    .lb-other td { color: #9ca3af; opacity: 0.9; }
 
     .leaderboard-mybest {
       margin-top: 6px;
@@ -750,156 +762,78 @@
       gap: 8px;
     }
 
-    
-    @media (max-width: 880px) { .fish-card { display:none; } }
+    /* ===== MOBILE ONLY ===== */
+    @media (max-width: 880px) {
+      /* не скрываем рыбы целиком — ими будет управлять JS */
+    }
 
-    /* ===== Mobile layout ===== */
     @media (max-width: 520px) {
       body { padding: 0 0 12px; }
-      .wrapper { padding: 0 8px; max-width: 100%; }
+      .wrapper { max-width: 100%; padding:0 10px; }
 
-      /* show mobile buttons only */
-      .mobile-only { display: inline-flex !important; }
+      .mobile-top-buttons{ display:flex; }
 
-      /* stats in one row, compact */
-      .stats-bar {
-        flex-direction: row;
-        gap: 8px;
-        margin: 8px 0 10px;
+      .stats-bar{
+        gap:6px;
+        margin-bottom:8px;
       }
-      .stat-card { padding: 8px 10px; border-radius: 14px; }
-      .stat-icon { width: 28px; height: 28px; font-size: 16px; }
-      .stat-current { font-size: 16px; }
-      .stat-total { display:none; } /* hide 'Всего' line on mobile */
+      .stat-card{ padding:8px 10px; }
+      .stat-title{ font-size:10px; }
+      .stat-current{ font-size:16px; }
+      .stat-total{ display:none; }
 
-      /* game full width */
       .game-card{
-        width: 100%;
+        margin-top: 16px;
         min-height: auto;
-        margin-top: 6px;
-        padding: 14px 12px 18px;
-        border-radius: 18px;
-      }
-      .circles-row { gap: 14px; }
-      .circle { width: 92px; height: 92px; font-size: 22px; }
-
-      /* leaderboard becomes fullscreen modal opened by class */
-      .leaderboard-panel{
-        display: none; /* hidden by default */
-        position: fixed;
-        inset: 0;
-        margin: 0;
-        border-radius: 0;
-        max-width: none;
-        width: 100vw;
-        height: 100vh;
-        z-index: 999;
-        overflow: hidden;
-        padding: 14px 12px 12px;
-        background: radial-gradient(circle at top left, rgba(250,204,21,0.18), rgba(5,10,30,0.98));
-      }
-      .leaderboard-panel.mobile-visible{ display:block; }
-      .leaderboard-title{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        font-size: 22px;
-        margin-bottom: 8px;
-      }
-      .leaderboard-table-wrapper{ max-height: calc(100vh - 170px); }
-      .leaderboard-mybest{ margin-top: 10px; }
-
-      .mobile-top-btn{
         width: 100%;
-        justify-content: center;
-        gap: 8px;
-        border-radius: 999px;
-        border: 1px solid rgba(250,204,21,0.9);
-        background: radial-gradient(circle at 30% 20%, #fff7cc, #ffd74c 40%, #f59e0b 100%);
-        color:#3b1f00;
-        font-weight:700;
-        font-size:14px;
-        padding:8px 14px;
-        margin-top: 6px;
-        margin-bottom: 4px;
-        cursor:pointer;
-        box-shadow: 0 6px 18px rgba(245,158,11,0.4);
+        padding:16px 14px 18px;
       }
-      .mobile-close-btn{
-        border:none;
-        background: rgba(15,23,42,0.95);
-        color:#fff;
-        width:32px;height:32px;
-        border-radius:999px;
-        font-size:16px;
-        cursor:pointer;
-      }
+      .top-row{ flex-wrap:wrap; gap:8px; }
+      .score-value{ font-size:30px; }
+      .circles-row{ gap:14px; }
+      .circle{ width:92px; height:92px; font-size:22px; }
 
-      /* fish panel in flow under game (JS adds mobile-layout class) */
-      body.mobile-layout .fish-card{
-        display:flex !important;
-        position: static !important;
-        width: 100% !important;
-        max-height: none !important;
-        margin-top: 10px;
-        right:auto; top:auto; left:auto;
-        border-radius: 18px;
-      }
-      body.mobile-layout .fish-grid{
+      /* На мобиле скрываем фикс-панель топа — будет в оверлее */
+      .leaderboard-panel{ display:none; }
+
+      /* Рыбы на мобиле делаются обычным блоком снизу через JS,
+         но на всякий случай: */
+      .fish-card.mobile-inline{
+        position: static;
+        width: 100%;
         max-height: none;
-        grid-template-columns: repeat(3, minmax(0,1fr));
+        margin: 12px 0 0;
+        right:auto; top:auto;
+      }
+      .fish-card.mobile-inline .fish-grid{
+        max-height: 42vh;
       }
 
-      /* overlays fullscreen */
-      .overlay{
-        position: fixed;
-        inset: 0;
-        border-radius: 0;
-        z-index: 1000;
-        padding: 14px 10px;
-      }
-      .overlay-card{ max-width: 100%; border-radius: 18px; }
-
-      /* hide desktop fixed fish on mobile until moved */
-      .fish-card{ display:none; }
-    }
-
-    .run-inline-item {
-      display:flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      background:rgba(15,23,42,0.9);
-      border:1px solid rgba(55,65,81,0.9);
-      font-size:12px;
-    }
-    .run-inline-icon {
-      font-size:16px;
-    }
-    .run-inline-label {
-      opacity:0.78;
-    }
-    .run-inline-value {
-      font-weight:700;
-      color:#e5f9ff;
-      min-width:32px;
-      text-align:right;
-    }
-
-    .circles-row { gap:18px; }
-      .circle { width:96px; height:96px; font-size:24px; }
-      .game-card {
-      min-height: 900px; padding:18px 16px 22px; }
-      .leaderboard-panel { display:none; }
-      .stats-bar { flex-direction:column; }
+      /* Оверлеи чуть крупнее */
+      .overlay-card{ padding:20px 16px; }
+      .overlay-title{ font-size:26px; }
+      .overlay-sub{ font-size:16px; }
+      .overlay-rules{ font-size:14px; }
+      .help-grid{ grid-template-columns:1fr; }
+      .help-cell{ font-size:13px; }
+      .help-circle{ width:86px; height:86px; font-size:40px; }
+      .help-caption-strong{ font-size:16px; }
+      .help-caption{ font-size:14px; }
+      .help-footer{ font-size:14px; }
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body>
-  <!-- ЛИДЕРБОРД -->
-  <div class="leaderboard-panel">
-    <div class="leaderboard-title">Топ игр <button id="mobileLeaderboardClose" class="mobile-only mobile-close-btn">✕</button></div>
+
+  <!-- ЯКОРЯ ДЛЯ ВОЗВРАТА ПАНЕЛЕЙ (десктоп) -->
+  <div id="desktopFishAnchor"></div>
+  <div id="desktopLbAnchor"></div>
+
+  <!-- ЛИДЕРБОРД (десктоп) -->
+  <div class="leaderboard-panel" id="leaderboardPanel">
+    <div class="leaderboard-title">Топ игр</div>
     <div class="leaderboard-table-wrapper">
       <table>
         <thead>
@@ -921,8 +855,8 @@
     </div>
   </div>
 
-  <!-- ПАНЕЛЬ РЫБ -->
-  <div class="fish-card">
+  <!-- ПАНЕЛЬ РЫБ (десктоп фикс справа) -->
+  <div class="fish-card" id="fishCard">
     <div class="fish-header">
       <div>
         <div class="fish-nick-row">
@@ -943,10 +877,16 @@
   </div>
 
   <!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
-  <div class="wrapper">
-    <button id="mobileLeaderboardBtn" class="mobile-only mobile-top-btn">🏆 Топ игр</button>
+  <div class="wrapper" id="wrapper">
+
+    <!-- МОБИЛЬНЫЕ КНОПКИ -->
+    <div class="mobile-top-buttons" id="mobileButtons">
+      <button class="mobile-btn" id="mobileLbBtn">🏆 Топ игр</button>
+      <button class="mobile-btn" id="mobileRulesBtn">❗ Правила</button>
+    </div>
+
     <!-- ПАНЕЛЬ МОНЕТ/АЛМАЗОВ/ЗВЁЗД -->
-    <div class="stats-bar">
+    <div class="stats-bar" id="statsBar">
       <div class="stat-card">
         <div class="stat-icon coins">💰</div>
         <div class="stat-main">
@@ -973,7 +913,7 @@
       </div>
     </div>
 
-    <div class="game-card">
+    <div class="game-card" id="gameCard">
       <div class="top-row">
         <div class="score-block">
           <div class="score-icon">$</div>
@@ -1016,91 +956,175 @@
         <button id="startBtn">Играть</button>
         <button id="rulesBtn"><span>❗</span><span>Правила</span></button>
       </div>
+    </div>
+  </div>
 
-      <!-- ПРАВИЛА / GAME OVER -->
-      <div class="overlay" id="gameOverOverlay">
-        <div class="overlay-card">
-          <div class="overlay-icon">🏆</div>
-          <div class="overlay-title" id="overlayTitle">Игра окончена!</div>
-          <div class="overlay-sub" id="overlaySub">Вы потеряли все жизни.</div>
-          <div class="overlay-result-label" id="overlayResultLabel">Ваш результат:</div>
-          <div class="overlay-score" id="overlayScore">0</div>
-          <button class="overlay-btn" id="playAgainBtn">Играть</button>
+  <!-- ПРАВИЛА / GAME OVER -->
+  <div class="overlay" id="gameOverOverlay">
+    <div class="overlay-card">
+      <div class="overlay-icon">🏆</div>
+      <div class="overlay-title" id="overlayTitle">Игра окончена!</div>
+      <div class="overlay-sub" id="overlaySub">Вы потеряли все жизни.</div>
+      <div class="overlay-result-label" id="overlayResultLabel">Ваш результат:</div>
+      <div class="overlay-score" id="overlayScore">0</div>
+      <button class="overlay-btn" id="playAgainBtn">Играть</button>
 
-          <div class="overlay-rules">
-            <div class="overlay-rules-row">
-              <span class="icon">🎯</span>
-              <span>Нажимайте <b>только</b> на светящийся круг.</span>
-            </div>
-            <div class="overlay-rules-row">
-              <span class="icon">⏳</span>
-              <span>Базовое время раунда — <b>2 секунды</b>, за каждую новую рыбу раунд становится быстрее на <b>0,1 с</b> (до минимума 0,5 с).</span>
-            </div>
-            <div class="overlay-rules-row">
-              <span class="icon">💣</span>
-              <span>Красный круг-бомба горит <b>половину времени раунда</b>: клик по нему = мгновенный проигрыш, пропуск — безопасен.</span>
-            </div>
-            <div class="overlay-rules-row">
-              <span class="icon">🟢</span>
-              <span>Когда красный круг гаснет, он превращается в <b>зелёный бонус</b> — даёт <b>+100</b> монет и алмаз.</span>
-            </div>
-            <div class="overlay-rules-row">
-              <span class="icon">⭐</span>
-              <span>Клик по обычному фиолетовому кругу приносит монеты и <b>1 звезду</b>.</span>
-            </div>
-            <div class="overlay-rules-row">
-              <span class="icon">🐟</span>
-              <span>Каждые <b>1000 монет</b> открывают рыбу в индексе и ускоряют игру.</span>
-            </div>
-            <div class="overlay-rules-row">
-              <span class="icon">💔</span>
-              <span><b>3 промаха</b> — игра заканчивается. Рыбы сохраняются, счёт монет сбрасывается.</span>
-            </div>
-          </div>
+      <div class="overlay-rules">
+        <div class="overlay-rules-row">
+          <span class="icon">🎯</span>
+          <span>Нажимайте <b>только</b> на светящийся круг.</span>
         </div>
-      </div>
-
-      <!-- HELP -->
-      <div class="overlay" id="helpOverlay">
-        <div class="overlay-card">
-          <div class="overlay-icon">❓</div>
-          <div class="overlay-title">Как играть</div>
-          <div class="overlay-sub">Успей нажать на правильный круг за время раунда и собирай монеты, алмазы и звёзды.</div>
-
-          <div class="help-grid">
-            <div class="help-cell">
-              <div class="help-circle purple">⭐</div>
-              <div class="help-caption-strong">Фиолетовый круг</div>
-              <div class="help-caption">Нажимай, чтобы получить случайное количество монет и <b>+1 звезду</b>.</div>
-            </div>
-            <div class="help-cell">
-              <div class="help-circle red">⚡</div>
-              <div class="help-caption-strong">Красная бомба</div>
-              <div class="help-caption">Опасна только пока горит (½ времени раунда). Затем превращается в зелёный бонус.</div>
-            </div>
-            <div class="help-cell">
-              <div class="help-circle green">💎</div>
-              <div class="help-caption-strong">Зелёный бонус</div>
-              <div class="help-caption">После бомбы даёт <b>+100</b> монет и <b>+1 алмаз</b>.</div>
-            </div>
-          </div>
-
-          <div class="help-footer">
-            Каждые <b>1000 монет</b> открывают новую рыбу в индексе справа. Время раунда ускоряется с каждой новой рыбой.
-          </div>
-
-          <button class="overlay-btn" id="helpCloseBtn">Понятно</button>
+        <div class="overlay-rules-row">
+          <span class="icon">⏳</span>
+          <span>Базовое время раунда — <b>2 секунды</b>, за каждую новую рыбу раунд становится быстрее на <b>0,1 с</b> (до минимума 0,5 с).</span>
         </div>
-      </div>
-
-      <!-- АНИМАЦИЯ СЕРДЦА -->
-      <div class="heart-overlay" id="heartOverlay">
-        <div class="heart-overlay-icon">💔</div>
+        <div class="overlay-rules-row">
+          <span class="icon">💣</span>
+          <span>Красный круг-бомба горит <b>половину времени раунда</b>: клик по нему = мгновенный проигрыш, пропуск — безопасен.</span>
+        </div>
+        <div class="overlay-rules-row">
+          <span class="icon">🟢</span>
+          <span>Когда красный круг гаснет, он превращается в <b>зелёный бонус</b> — даёт <b>+100</b> монет и алмаз.</span>
+        </div>
+        <div class="overlay-rules-row">
+          <span class="icon">⭐</span>
+          <span>Клик по обычному фиолетовому кругу приносит монеты и <b>1 звезду</b>.</span>
+        </div>
+        <div class="overlay-rules-row">
+          <span class="icon">🐟</span>
+          <span>Каждые <b>1000 монет</b> открывают рыбу в индексе и ускоряют игру.</span>
+        </div>
+        <div class="overlay-rules-row">
+          <span class="icon">💔</span>
+          <span><b>3 промаха</b> — игра заканчивается. Рыбы сохраняются, счёт монет сбрасывается.</span>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- HELP -->
+  <div class="overlay" id="helpOverlay">
+    <div class="overlay-card">
+      <div class="overlay-icon">❓</div>
+      <div class="overlay-title">Как играть</div>
+      <div class="overlay-sub">Успей нажать на правильный круг за время раунда и собирай монеты, алмазы и звёзды.</div>
+
+      <div class="help-grid">
+        <div class="help-cell">
+          <div class="help-circle purple">⭐</div>
+          <div class="help-caption-strong">Фиолетовый круг</div>
+          <div class="help-caption">Нажимай, чтобы получить случайное количество монет и <b>+1 звезду</b>.</div>
+        </div>
+        <div class="help-cell">
+          <div class="help-circle red">⚡</div>
+          <div class="help-caption-strong">Красная бомба</div>
+          <div class="help-caption">Опасна только пока горит (½ времени раунда). Затем превращается в зелёный бонус.</div>
+        </div>
+        <div class="help-cell">
+          <div class="help-circle green">💎</div>
+          <div class="help-caption-strong">Зелёный бонус</div>
+          <div class="help-caption">После бомбы даёт <b>+100</b> монет и <b>+1 алмаз</b>.</div>
+        </div>
+      </div>
+
+      <div class="help-footer">
+        Каждые <b>1000 монет</b> открывают новую рыбу в индексе справа. Время раунда ускоряется с каждой новой рыбой.
+      </div>
+
+      <button class="overlay-btn" id="helpCloseBtn">Понятно</button>
+    </div>
+  </div>
+
+  <!-- МОБИЛЬНЫЙ ОВЕРЛЕЙ ТОПА -->
+  <div class="overlay" id="mobileLbOverlay">
+    <div class="overlay-card" style="max-width:640px;">
+      <div class="overlay-title">Топ игр</div>
+      <div class="leaderboard-table-wrapper" style="max-height:60vh;">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Имя</th><th>Рыб</th><th>Время</th></tr>
+          </thead>
+          <tbody id="mobileLeaderboardBody"></tbody>
+        </table>
+      </div>
+      <div class="leaderboard-mybest" id="mobileMyBestBlock"></div>
+      <button class="overlay-btn" id="mobileLbCloseBtn">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- АНИМАЦИЯ СЕРДЦА -->
+  <div class="heart-overlay" id="heartOverlay">
+    <div class="heart-overlay-icon">💔</div>
+  </div>
+
   <script>
+    // ==== Firebase init (online leaderboard) ====
+    const firebaseConfig = {
+      apiKey: "AIzaSyAjaFPl1f4MA5IzFxIWRZ58FvrnB5mRhGo",
+      authDomain: "fast-click-fish.firebaseapp.com",
+      projectId: "fast-click-fish",
+      storageBucket: "fast-click-fish.firebasestorage.app",
+      messagingSenderId: "1056500535536",
+      appId: "1:1056500535536:web:17072be3e0150bdf57f235",
+      measurementId: "G-V05JPW6BM1"
+    };
+
+    try { firebase.initializeApp(firebaseConfig); }
+    catch (e) { console.warn("Firebase init error (maybe already initialized):", e); }
+
+    const db = firebase.firestore();
+    const LEADERBOARD_COLLECTION = "fast_click_leaderboard";
+    let cloudLeaderboard = [];
+
+    async function pushRunToCloud(row) {
+      try {
+        await db.collection(LEADERBOARD_COLLECTION).add({
+          name: row.name || "Игрок",
+          fishGained: row.fishGained || 0,
+          totalFish: row.totalFish || 0,
+          time: row.time || 0,
+          score: row.score || 0,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (e) {
+        console.warn("Не удалось отправить результат в Firestore", e);
+      }
+    }
+
+    async function loadCloudLeaderboard() {
+      try {
+        const snap = await db.collection(LEADERBOARD_COLLECTION)
+          .orderBy("fishGained", "desc")
+          .orderBy("score", "desc")
+          .orderBy("time", "asc")
+          .limit(100).get();
+
+        cloudLeaderboard = [];
+        snap.forEach(doc => {
+          const d = doc.data();
+          cloudLeaderboard.push({
+            name: d.name || "Игрок",
+            fishGained: d.fishGained || 0,
+            totalFish: d.totalFish || 0,
+            time: d.time || 0,
+            score: d.score || 0
+          });
+        });
+
+        // резерв в локалке
+        try{ localStorage.setItem('fastClick_cloudCache', JSON.stringify(cloudLeaderboard)); }catch(e){}
+
+        renderLeaderboard(cloudLeaderboard);
+      } catch (e) {
+        console.warn("Не удалось загрузить онлайн-лидерборд из Firestore", e);
+        // fallback: кеш
+        let cached = [];
+        try{ cached = JSON.parse(localStorage.getItem('fastClick_cloudCache')||'[]'); }catch(e){}
+        if(cached.length) renderLeaderboard(cached);
+        else renderLeaderboard(loadLeaderboard());
+      }
+    }
+
     const MAX_MISSES = 3;
     const BASE_ROUND_TIME_MS = 2000;
     const MIN_ROUND_TIME_MS = 500;
@@ -1124,8 +1148,16 @@
     const helpOverlay = document.getElementById('helpOverlay');
     const helpCloseBtn = document.getElementById('helpCloseBtn');
 
+    const mobileLbOverlay = document.getElementById('mobileLbOverlay');
+    const mobileLbBtn = document.getElementById('mobileLbBtn');
+    const mobileRulesBtn = document.getElementById('mobileRulesBtn');
+    const mobileLbCloseBtn = document.getElementById('mobileLbCloseBtn');
+    const mobileLeaderboardBody = document.getElementById('mobileLeaderboardBody');
+    const mobileMyBestBlock = document.getElementById('mobileMyBestBlock');
+
     const heartOverlay = document.getElementById('heartOverlay');
 
+    const fishCard = document.getElementById('fishCard');
     const fishGrid = document.getElementById('fishGrid');
     const fishProgressText = document.getElementById('fishProgressText');
     const fishProgressFill = document.getElementById('fishProgressFill');
@@ -1141,6 +1173,10 @@
     const diamondsTotalEl = document.getElementById('diamondsTotal');
     const starsRunEl = document.getElementById('starsRun');
     const starsTotalEl = document.getElementById('starsTotal');
+
+    const wrapper = document.getElementById('wrapper');
+    const gameCard = document.getElementById('gameCard');
+    const desktopFishAnchor = document.getElementById('desktopFishAnchor');
 
     const fishList = [
       { name: 'Рыба-клоун', emoji: '🐠' },
@@ -1171,7 +1207,7 @@
       return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     }
 
-    let score = 0;            // монеты за текущую игру
+    let score = 0;
     let misses = 0;
     let activeIndex = null;
 
@@ -1192,16 +1228,31 @@
 
     let fishSlots = [];
     let playerName = '';
-    let helpSeen = false;
     let pendingContinue = false;
-    let overlayMode = null;
 
-    // алмазы / звёзды и глобальные счётчики
     let diamondsRun = 0;
     let starsRun = 0;
     let totalCoinsAll = 0;
     let totalDiamondsAll = 0;
     let totalStarsAll = 0;
+
+    // ===== Mobile layout rearrange =====
+    let fishInMobile = False = false;
+    function applyResponsiveLayout(){
+      const isMobile = window.innerWidth <= 520;
+      if(isMobile && !fishInMobile){
+        // move fish under game
+        fishCard.classList.add('mobile-inline');
+        wrapper.appendChild(fishCard);
+        fishInMobile = true;
+      }
+      if(!isMobile && fishInMobile){
+        fishCard.classList.remove('mobile-inline');
+        desktopFishAnchor.after(fishCard);
+        fishInMobile = false;
+      }
+    }
+    window.addEventListener('resize', applyResponsiveLayout);
 
     function updateStatsUI(){
       coinsRunEl.textContent = formatNum(totalCoinsAll);
@@ -1291,7 +1342,9 @@
       let html='';
       for(let i=0;i<activeHearts;i++) html+='<span class="heart-full">❤️</span>';
       for(let i=0;i<misses;i++) html+='<span class="heart-empty">❤</span>';
-      heartsView.innerHTML = html;
+
+      const targets = document.querySelectorAll('#heartsView, [data-hearts-view], .hearts.hearts-view');
+      targets.forEach(t => t.innerHTML = html);
     }
 
     function resetUI(){
@@ -1343,7 +1396,7 @@
       playerNameInput.value = playerName;
       playerNameInput.readOnly = true;
       saveNameBtn.style.display = 'none';
-      renderLeaderboard();
+      renderLeaderboard(cloudLeaderboard.length?cloudLeaderboard:loadLeaderboard());
     }
 
     function loadLeaderboard(){
@@ -1369,8 +1422,9 @@
       return `${String(m).padStart(2,'0')}:${String(s2).padStart(2,'0')}.${ms}`;
     }
 
-    function renderMyBest(data){
-      if(!myBestBlock) return;
+    function renderMyBest(data, targetBlock){
+      const block = targetBlock || myBestBlock;
+      if(!block) return;
       let best = null;
       const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
       data.forEach(row=>{
@@ -1386,48 +1440,48 @@
       });
 
       if(!best){
-        myBestBlock.innerHTML = `
+        block.innerHTML = `
           <div class="leaderboard-mybest-title">Мой лучший результат</div>
-          <div class="leaderboard-mybest-row">
-            <span>Пока нет данных.</span>
-          </div>`;
+          <div class="leaderboard-mybest-row"><span>Пока нет данных.</span></div>`;
       } else {
-        myBestBlock.innerHTML = `
+        block.innerHTML = `
           <div class="leaderboard-mybest-title">Мой лучший результат</div>
           <div class="leaderboard-mybest-row">
-            <span style=\"font-size:13px;\">Рыб всего: <b style=\"font-size:16px;\">${best.totalFish}</b></span>
-            <span style=\"font-size:13px;\">Время: <b style=\"font-size:16px;\">${formatTime(best.time)}</b></span>
+            <span style="font-size:13px;">Рыб всего: <b style="font-size:16px;">${best.totalFish}</b></span>
+            <span style="font-size:13px;">Время: <b style="font-size:16px;">${formatTime(best.time)}</b></span>
           </div>`;
       }
     }
 
-    function renderLeaderboard(){
-      const data = loadLeaderboard();
-      leaderboardBody.innerHTML='';
-      data.forEach((row, idx)=>{
-        let rowClass='';
-        if(idx === 0) rowClass='gold-row';
-        else if(idx === 1) rowClass='silver-row';
-        else if(idx === 2) rowClass='bronze-row';
-        else rowClass='lb-other';
+    function renderLeaderboard(data){
+      const rows = data || [];
+      leaderboardBody.innerHTML = '';
+      mobileLeaderboardBody.innerHTML = '';
 
-        const tr=document.createElement('tr');
+      rows.forEach((row, idx) => {
+        let rowClass = '';
+        if (idx === 0) rowClass = 'gold-row';
+        else if (idx === 1) rowClass = 'silver-row';
+        else if (idx === 2) rowClass = 'bronze-row';
+        else rowClass = 'lb-other';
+
+        const tr = document.createElement('tr');
         tr.className = rowClass;
-        tr.innerHTML = `
-          <td>${idx+1}</td>
-          <td>${row.name}</td>
-          <td>${row.totalFish}</td>
-          <td>${formatTime(row.time)}</td>`;
+        tr.innerHTML = `<td>${idx + 1}</td><td>${row.name}</td><td>${row.totalFish}</td><td>${formatTime(row.time)}</td>`;
         leaderboardBody.appendChild(tr);
+
+        const tr2 = tr.cloneNode(true);
+        mobileLeaderboardBody.appendChild(tr2);
       });
 
-      renderMyBest(data);
+      renderMyBest(rows, myBestBlock);
+      renderMyBest(rows, mobileMyBestBlock);
     }
 
     function addResultToLeaderboard(){
-      const durationSec = (Date.now() - runStartTimeMs)/1000;
-      const data = loadLeaderboard();
+      const durationSec = (Date.now() - runStartTimeMs) / 1000;
       const nameToUse = playerName || playerNameInput.value.trim() || 'Игрок';
+
       const entry = {
         name: nameToUse,
         fishGained: runFishGained,
@@ -1435,15 +1489,32 @@
         time: durationSec,
         score: score
       };
+
+      // отправляем в Firestore
+      pushRunToCloud(entry);
+
+      // обновляем локальную копию облачного топа
+      let data = cloudLeaderboard ? cloudLeaderboard.slice() : [];
       data.push(entry);
-      data.sort((a,b)=>{
-        if(b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
-        if(b.score !== a.score) return b.score - a.score;
+
+      data.sort((a, b) => {
+        if (b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
+        if (b.score !== a.score) return b.score - a.score;
         return a.time - b.time;
       });
-      const top = data.slice(0, 50);
-      saveLeaderboard(top);
-      renderLeaderboard();
+
+      cloudLeaderboard = data.slice(0, 100);
+      renderLeaderboard(cloudLeaderboard);
+
+      // локальный резерв
+      const local = loadLeaderboard();
+      local.push(entry);
+      local.sort((a,b)=>{
+        if (b.fishGained !== a.fishGained) return b.fishGained - a.fishGained;
+        if (b.score !== a.score) return b.score - a.score;
+        return a.time - b.time;
+      });
+      saveLeaderboard(local.slice(0,50));
     }
 
     function openGameOver(reason){
@@ -1462,23 +1533,18 @@
         overlayTitle.textContent = 'Игра окончена!';
         overlaySub.textContent = 'Раунд завершён.';
       }
-      overlayMode = 'gameOver';
       gameOverOverlay.classList.add('visible');
     }
 
     function endGame(reason=''){
       roundActive = false;
-      if(timerId){
-        clearInterval(timerId);
-        timerId = null;
-      }
+      if(timerId){ clearInterval(timerId); timerId = null; }
       circles.forEach(c=>c.classList.remove('active','bomb-visible','green-bonus'));
       startBtn.disabled = false;
       addResultToLeaderboard();
       openGameOver(reason);
 
       resetUI();
-      // сброс только текущей игры
       score = 0;
       diamondsRun = 0;
       starsRun = 0;
@@ -1512,11 +1578,8 @@
         const icon = btn.querySelector('.circle-icon');
         if(idx === activeIndex){
           btn.classList.add('active');
-          if(bombRound){
-            if(icon) icon.textContent = '⚡';
-          } else {
-            if(icon) icon.textContent = '⭐';
-          }
+          if(bombRound){ if(icon) icon.textContent = '⚡'; }
+          else { if(icon) icon.textContent = '⭐'; }
         } else {
           if(icon) icon.textContent = '⚡';
         }
@@ -1542,10 +1605,7 @@
     }
 
     function nextRound(){
-      if(misses >= MAX_MISSES){
-        endGame('misses');
-        return;
-      }
+      if(misses >= MAX_MISSES){ endGame('misses'); return; }
 
       setupRoundState();
 
@@ -1553,9 +1613,7 @@
       const startTime = performance.now();
       timerFill.style.transform='scaleX(1)';
 
-      if(timerId){
-        clearInterval(timerId);
-      }
+      if(timerId){ clearInterval(timerId); }
       timerId = setInterval(()=>{
         if(!roundActive) return;
         const elapsed = performance.now() - startTime;
@@ -1587,11 +1645,7 @@
     function handleTimeout(){
       if(!roundActive) return;
       roundActive = false;
-
-      if(bombRound && bombDangerIndex !== null){
-        bombRound = false;
-      }
-
+      if(bombRound && bombDangerIndex !== null){ bombRound = false; }
       handleMissCommon();
     }
 
@@ -1622,8 +1676,6 @@
 
         saveTotals();
         updateStatsUI();
-
-        scoreEl.textContent = formatNum(score);
         tryUnlockFish();
         roundActive = false;
         bombRound = false;
@@ -1652,8 +1704,6 @@
       gameOverOverlay.classList.remove('visible');
       misses = 0;
       updateHearts();
-
-      scoreEl.textContent = formatNum(score);
 
       diamondsRun = 0;
       starsRun = 0;
@@ -1684,34 +1734,35 @@
       overlayResultLabel.style.display = 'none';
       overlayScore.style.display = 'none';
       playAgainBtn.textContent = 'Играть';
-      overlayMode = 'rules';
       gameOverOverlay.classList.add('visible');
     }
 
     function showHelpOverlay(){ helpOverlay.classList.add('visible'); }
     function hideHelpOverlay(){
       helpOverlay.classList.remove('visible');
-      helpSeen = true;
       try{ localStorage.setItem('fastClickHelpSeen','1'); }catch(e){}
     }
 
-    playAgainBtn.addEventListener('click', ()=>{
-      gameOverOverlay.classList.remove('visible');
-    });
-
-    startBtn.addEventListener('click', ()=>{
-      if(pendingContinue){
-        continueAfterMiss();
-      } else {
-        startGame();
-      }
-    });
-
+    // ===== Buttons & overlays =====
+    playAgainBtn.addEventListener('click', ()=>{ gameOverOverlay.classList.remove('visible'); });
+    startBtn.addEventListener('click', ()=>{ pendingContinue ? continueAfterMiss() : startGame(); });
     rulesBtn.addEventListener('click', showRulesOverlay);
 
-    helpCloseBtn.addEventListener('click', ()=>{ hideHelpOverlay(); });
+    mobileRulesBtn.addEventListener('click', showRulesOverlay);
 
-    saveNameBtn.addEventListener('click', ()=>{ savePlayerName(); });
+    helpCloseBtn.addEventListener('click', hideHelpOverlay);
+
+    mobileLbBtn.addEventListener('click', ()=>{
+      mobileLbOverlay.classList.add('visible');
+    });
+    mobileLbCloseBtn.addEventListener('click', ()=>{
+      mobileLbOverlay.classList.remove('visible');
+    });
+    mobileLbOverlay.addEventListener('click', (e)=>{
+      if(e.target === mobileLbOverlay) mobileLbOverlay.classList.remove('visible');
+    });
+
+    saveNameBtn.addEventListener('click', savePlayerName);
     playerNameInput.addEventListener('click', ()=>{
       if(playerNameInput.readOnly){
         playerNameInput.readOnly = false;
@@ -1727,60 +1778,21 @@
       if(e.key === 'Enter'){ savePlayerName(); }
     });
 
-    
-    // ===== Mobile layout tweaks (no effect on desktop) =====
-    (function setupMobileLayout(){
-      const isMobile = window.matchMedia && window.matchMedia("(max-width: 520px)").matches;
-      if(!isMobile) return;
-
-      document.body.classList.add('mobile-layout');
-
-      // move stats bar inside game card top
-      const statsBar = document.querySelector('.stats-bar');
-      const gameCard = document.querySelector('.game-card');
-      const topRow = document.querySelector('.top-row');
-      if(statsBar && gameCard && topRow){
-        gameCard.insertBefore(statsBar, topRow);
-      }
-
-      // move fish panel under game
-      const fishCard = document.querySelector('.fish-card');
-      const wrapper = document.querySelector('.wrapper');
-      if(fishCard && wrapper){
-        wrapper.appendChild(fishCard);
-      }
-
-      // leaderboard button toggle
-      const lbPanel = document.querySelector('.leaderboard-panel');
-      const openBtn = document.getElementById('mobileLeaderboardBtn');
-      const closeBtn = document.getElementById('mobileLeaderboardClose');
-      function close(){
-        if(lbPanel) lbPanel.classList.remove('mobile-visible');
-      }
-      function open(){
-        if(lbPanel) lbPanel.classList.add('mobile-visible');
-      }
-      if(openBtn && lbPanel){
-        openBtn.addEventListener('click', open);
-      }
-      if(closeBtn && lbPanel){
-        closeBtn.addEventListener('click', close);
-      }
-      // close on tap outside table (background)
-      if(lbPanel){
-        lbPanel.addEventListener('click', (e)=>{
-          if(e.target === lbPanel) close();
-        });
-      }
-    })();
-
+    // ===== Init =====
     buildFishGrid();
     resetUI();
     loadPlayerName();
-    renderLeaderboard();
-    loadTotals();
 
-    showHelpOverlay();
+    // сначала локальный топ, потом облако
+    renderLeaderboard(loadLeaderboard());
+    loadCloudLeaderboard();
+
+    loadTotals();
+    applyResponsiveLayout();
+
+    // Help first time
+    const helpSeen = localStorage.getItem('fastClickHelpSeen') === '1';
+    if(!helpSeen) showHelpOverlay();
   </script>
 </body>
 </html>
